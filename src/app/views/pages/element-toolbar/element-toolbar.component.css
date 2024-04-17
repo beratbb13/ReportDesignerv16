@@ -1,0 +1,36 @@
+.main {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgb(15, 15, 15);
+    border-radius: 15px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #ffffff;
+}
+
+.container {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+/*
+.item {
+    background: rgb(75, 75, 75);
+    padding: 5px;
+    width: 50%;
+    height: 60px;
+    margin: 10px;
+    color: white;
+    font-weight: bold;
+    font-size: 1em;
+    text-align: center;
+}*/

@@ -1,0 +1,26 @@
+::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgb(50, 50, 50);
+    border-radius: 15px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #ffffff;
+}
+
+.selected {
+    background-color: #4444ff;
+}
+
+.navbar {
+    padding: 0 5px;
+    /* Üst, Sağ, Alt, Sol sırasıyla */
+}
+
+.btn {
+    border-radius: 0px;
+}

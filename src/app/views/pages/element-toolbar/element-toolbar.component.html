@@ -1,0 +1,45 @@
+<div class="main">
+  <div class="example-list d-flex justify-content-center" style="padding: 5px; margin: 10px">
+    <input type="search" class="form-control" [(ngModel)]="searchBar" (ngModelChange)="search()" />
+  </div>
+
+  <div class="example-list" cdkDropList #todoList="cdkDropList" [cdkDropListConnectedTo]="[doneList]"
+    (cdkDropListDropped)="drop($event)" cdkDropListSortingDisabled [cdkDropListData]="filteredElements">
+    <div class="row" style="margin: 0px;">
+      @for(element of filteredElements; track element){
+      <div class="col-6">
+        <!--<div class="card mb-2" cdkDrag [cdkDragDisabled]="!draggable">
+          <div class="card-header bg-white" style="display: flex; justify-content: center; align-items: center;">
+            <img [src]="element.icon" width="20%" height="40%">
+          </div>
+          <div class="card-body" style="display: flex; justify-content: center; align-items: center;">
+            <img [src]="element.icon" width="20%" height="40%">
+            <br>
+            <span style="color: black; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"> {{
+              element.label
+              }}</span>
+            <div *cdkDragPreview style="width: 50px; height: 50px; border: 1px solid black"></div>
+          </div>
+        </div>-->
+
+        <div class="card mb-2" cdkDrag [cdkDragDisabled]="!draggable">
+          <div class="card-body" style="display: flex; flex-direction: column; align-items: center;">
+            <img [src]="element.icon" width="30%" height="60%">
+            <span
+              style="font-size: 10px; color: black; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 5px;">
+              {{ element.label }}
+            </span>
+            <div *cdkDragPreview style="width: 10px; height: 10px; border: 1px solid black; margin-top: 5px;"></div>
+          </div>
+        </div>
+
+      </div>
+      }
+    </div>
+  </div>
+</div>
+
+<div class="example-container" style="display: none">
+  <div cdkDropList #doneList="cdkDropList" [cdkDropListData]="addedElements" [cdkDropListConnectedTo]="[todoList]"
+    class="example-list" (cdkDropListDropped)="drop($event)"></div>
+</div>

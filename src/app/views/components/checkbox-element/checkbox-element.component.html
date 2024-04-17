@@ -1,0 +1,9 @@
+<span [style.fontSize.px]="options.fontSize">{{ options.text }}</span>&nbsp;
+<input type="checkbox" [style.color]="options.fontColor" [readOnly]="options.readOnly"
+    [style.width.px]="style.width - (options.fontSize + 10)" [style.height.px]="style.height - (options.fontSize + 10)"
+    *ngIf="styleRelative === null">
+
+<span [style.fontSize.px]="options.fontSize">{{ options.text }}</span>&nbsp;
+<input type="checkbox" [style.color]="options.fontColor" [readOnly]="options.readOnly"
+    [style.width.%]="styleRelative.width - (options.fontSize + 10)" [style.height.%]="styleRelative.height - 5"
+    *ngIf="styleRelative !== null">

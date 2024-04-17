@@ -1,0 +1,25 @@
+<!--<div [style.padding.left.px]="padding" style="cursor: pointer;">
+    <img src="assets/{{ isFile ? 'file' : 'folder' }}.png" width="12" height="12">&nbsp;
+    <span style="font-size: 15px; font-weight: 500;">{{ name }}</span>
+    <div *ngIf="!isFile" [ngStyle]="{'display': isOpen ? 'block' : 'none'}">
+        <app-sub-folder *ngFor="let subfolder of folders" [folder]="subfolder" [padding]="padding + 8"></app-sub-folder>
+        @for( fileItem of files; track fileItem;){
+        <div>
+            <img src="assets/file.png" width="12" height="12">&nbsp;
+            <span style="font-size: 15px; font-weight: 500;">{{ fileItem.name }}</span>
+        </div>
+        }
+    </div>
+</div>-->
+
+
+<div style="padding-left: 13px; cursor: pointer;" [ngStyle]="{'display': folder.isOpen ? 'block' : 'none'}">
+    <img src="assets/folder.png" width="12" height="12">&nbsp; <span style="font-size: 15px; font-weight: 500;">{{
+        folder.folderName}}</span>
+</div>
+@for(file of folder.files; track file){
+<div style="padding-left: 18px; cursor: pointer;">
+    <img src="assets/file.png" width="12" height="12">&nbsp; <span style="font-size: 15px; font-weight: 500;">{{
+        file.name}}</span>
+</div>
+}

@@ -1,0 +1,15 @@
+<select class="form-select" [style.width.px]="style.width" [style.height.px]="style.height"
+    [style.color]="options.fontColor" [style.fontSize.px]="options.fontSize" *ngIf="styleRelative === null">
+    @for(option of options.options; track option){
+    <option [value]="option.value" [style.color]="options.fontColor" [style.fontSize.px]="options.fontSize">{{
+        option.text }}</option>
+    }
+</select>
+
+<select class="form-select" [style.width.%]="styleRelative.width" [style.height.%]="styleRelative.height"
+    [style.color]="options.fontColor" [style.fontSize.px]="options.fontSize" *ngIf="styleRelative !== null">
+    @for(option of options.options; track option){
+    <option [value]="option.value" [style.color]="options.fontColor" [style.fontSize.px]="options.fontSize">{{
+        option.text }}</option>
+    }
+</select>

@@ -1,0 +1,40 @@
+<div style="overflow-y: auto; padding: 10px; border: 1px solid black; border-top-left-radius: 10px; border-bottom-left-radius: 10px; width: 100%; height: 90vh"
+    *ngIf="selectedElement !== null" (focusout)="onSubmit()">
+    <nav class="navbar navbar-light bg-light">
+        <!--<button mat-button (click)="removeElement()">Remove</button>-->
+    </nav>
+    <form [formGroup]="propertyForm">
+        @for (formGroup of properties.controls; let i = $index; track formGroup){
+        <div class="form-group mb-1" style="padding-bottom: 5px;">
+            <label class="mb-1" style="width: 100%; display: flex; justify-content: center; font-size: 15px;">{{
+                getFormControlKey(formGroup) }}</label>
+            @switch(getControlTypeByAttributeName(getFormControlKey(formGroup))){
+            @case ('text'){
+            <input type="text" class="form-control mb-1" [maxlength]="getMaxLength()" [minlength]="getMinLength()"
+                [formControl]="getFormControlValue(formGroup)" />
+            } @case ('number'){
+            <input type="number" class="form-control mb-1" [max]="getMax()" [min]="getMin()"
+                [formControl]="getFormControlValue(formGroup)" />
+            } @case ('color'){
+            <input type="color" class="form-control form-control-color mb-1"
+                [formControl]="getFormControlValue(formGroup)" />
+            } @case ('file'){
+            <input type="file" accept=".png, .jpg, .jpeg" class="form-control mb-1"
+                [formControl]="getFormControlValue(formGroup)" (change)="onFileSelected($event, formGroup)" />
+            } @case ('boolean'){ &nbsp;&nbsp;&nbsp;<input type="checkbox" class="form-control form-check-input mb-1 p-2"
+                [formControl]="getFormControlValue(formGroup)" />
+            <br />
+            }
+            @default {
+            <input type="text" class="form-control mb-1" [formControl]="getFormControlValue(formGroup)" />
+            }
+            }
+        </div>
+        }
+    </form>
+</div>
+
+<div style="overflow-y: auto; padding: 10px; border: 1px solid black; border-top-left-radius: 10px; border-bottom-left-radius: 10px; width: 100%; height: 45vh;
+ display: flex; justify-content: center; align-items: center;" *ngIf="selectedElement === null">
+    Henüz bir element seçilmedi.
+</div>

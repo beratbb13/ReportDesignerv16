@@ -1,0 +1,79 @@
+<div #content id="content" style="
+    border: 3px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: auto;
+    width: 100%;
+    height: 80vh;
+  ">
+  <div class="example-boundary" *ngIf="elements.length" #boundaryRef>
+    @for(elementRef of elements; track elementRef){
+    <div #wrapper class="frame-wrapper" class="example-box" cdkDragBoundary=".example-boundary" cdkDrag [ngStyle]="{
+        'left.px': elementRef.position.x,
+        'top.px': elementRef.position.y
+      }" [cdkDragDisabled]="elementRef.isDragDisabled" (cdkDragEnded)="onDragEnded($event, elementRef)">
+      <div class="content-wrapper" [style.width.px]="elementRef.style.width" [style.height.px]="elementRef.style.height"
+        [ngStyle]="{ cursor: elementRef.isDragDisabled ? 'pointer' : 'move' }"
+        style="display: flex; justify-content: center; align-items: center; overflow: hidden;"
+        (contextmenu)="removeElement($event, elementRef)">
+
+        <app-textbox-element [options]="elementRef.element" [style]="elementRef.style"
+          *ngIf="elementRef.label.toLowerCase() == 'textbox'" (click)="onFocus(elementRef)"></app-textbox-element>
+
+        <app-button-element [options]="elementRef.element" [style]="elementRef.style"
+          *ngIf="elementRef.label.toLowerCase() == 'button'" (click)="onFocus(elementRef)"></app-button-element>
+
+        <app-checkbox-element [options]="elementRef.element" [style]="elementRef.style"
+          *ngIf="elementRef.label.toLowerCase() == 'checkbox'" (click)="onFocus(elementRef)"></app-checkbox-element>
+
+        <app-combobox-element [options]="elementRef.element" [style]="elementRef.style"
+          *ngIf="elementRef.label.toLowerCase() == 'combobox'" (click)="onFocus(elementRef)"></app-combobox-element>
+
+        <app-image-element [options]="elementRef.element" [style]="elementRef.style"
+          *ngIf="elementRef.label.toLowerCase() == 'image'" (click)="onFocus(elementRef)"></app-image-element>
+
+        <app-label-element [options]="elementRef.element" [style]="elementRef.style"
+          *ngIf="elementRef.label.toLowerCase() == 'label'" (click)="onFocus(elementRef)"></app-label-element>
+
+        <app-link-element [options]="elementRef.element" [style]="elementRef.style"
+          *ngIf="elementRef.label.toLowerCase() == 'link'" (click)="onFocus(elementRef)"></app-link-element>
+
+        <app-listbox-element [options]="elementRef.element" [style]="elementRef.style"
+          *ngIf="elementRef.label.toLowerCase() == 'listbox'" (click)="onFocus(elementRef)"></app-listbox-element>
+
+        <app-radio-element [options]="elementRef.element" [style]="elementRef.style"
+          *ngIf="elementRef.label.toLowerCase() == 'radio button'" (click)="onFocus(elementRef)"></app-radio-element>
+
+        <app-table-element [options]="elementRef.element" [elementRef]="elementRef" [style]="elementRef.style"
+          style="position: absolute;" [style.left.px]="elementRef.position.x" [style.top.px]="elementRef.position.y"
+          *ngIf="elementRef.label.toLowerCase() == 'table'" (click)="tableRenderer(elementRef)"></app-table-element>
+
+        <app-textarea-element [options]="elementRef.element" [style]="elementRef.style"
+          *ngIf="elementRef.label.toLowerCase() == 'textarea'" (click)="onFocus(elementRef)"></app-textarea-element>
+      </div>
+      <div class="resizers" [style.width.px]="elementRef.style.width" [style.height.px]="elementRef.style.height">
+        <div (mousedown)="
+            startResize($event, 'x', elementRef);
+            elementRef.isDragDisabled = true
+          " (mouseup)="elementRef.isDragDisabled = false" class="resizer right"></div>
+
+        <div #resizeCorner (mousedown)="
+            startResize($event, 'y', elementRef);
+            elementRef.isDragDisabled = true
+          " (mouseup)="elementRef.isDragDisabled = false" class="resizer bottom"></div>
+        <div #resizeCorner (mousedown)="
+            startResize($event, 'xy', elementRef);
+            elementRef.isDragDisabled = true
+          " (mouseup)="elementRef.isDragDisabled = false" class="resizer bottom-right"></div>
+      </div>
+    </div>
+    }
+  </div>
+  <div class="example-boundary d-flex justify-content-center align-items-center" style="background-color: gray;"
+    *ngIf="fileId === 0">
+    <div style="font-size: 40px; z-index: 1;">
+      {{ contentJSON }}
+    </div>
+  </div>
+</div>

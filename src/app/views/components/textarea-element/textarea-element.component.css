@@ -1,0 +1,23 @@
+textarea {
+    resize: none;
+    border: none;
+    scroll-behavior: smooth;
+    overflow: auto;
+}
+
+textarea:focus {
+    border: none;
+}
+
+::-webkit-scrollbar {
+    width: 1px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #6a64f1;
+    border-radius: 15px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #ffffff;
+}

@@ -1,0 +1,18 @@
+<div style="margin-bottom: 12px;" [style.padding-left.px]="paddingLeft * count"
+    (click)="!showFiles ? chooseFolder(folder) : chooseFolder(null)">
+    <img src="assets/folder.png" width="20" height="20">&nbsp; <span style="font-size: 22px; font-weight: 400;">{{
+        folder.folderName}}</span>
+</div>
+<div *ngIf="showFiles">
+    @for(file of folder.files; track file){
+    <div class="file" [style.padding-left.px]="paddingLeft * count" (click)="selected(file)"
+        style="margin-bottom: 12px;">
+        <!---->
+        <img src="assets/file.png" width="20" height="20">&nbsp; <span style="font-size: 22px; font-weight: 400;">{{
+            file.name}}</span>
+    </div>
+    }
+</div>
+@for(folder of folder.folders; track folder){
+<app-sub-file [folder]="folder" [toggle]="toggle" [paddingLeft]="paddingLeft" [showFiles]="showFiles"></app-sub-file>
+}

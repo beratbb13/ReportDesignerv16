@@ -1,0 +1,17 @@
+table {
+    table-layout: fixed;
+}
+
+::-webkit-scrollbar {
+    width: 0.1px;
+    height: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgb(15, 15, 15);
+    border-radius: 15px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #ffffff;
+}
