@@ -11,16 +11,3 @@
 ::-webkit-scrollbar-track {
     background-color: #ffffff;
 }
-
-.selected {
-    background-color: #4444ff;
-}
-
-.navbar {
-    padding: 0 5px;
-    /* Üst, Sağ, Alt, Sol sırasıyla */
-}
-
-.btn {
-    border-radius: 0px;
-}

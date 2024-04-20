@@ -5,14 +5,33 @@ import { TopBarComponent } from './views/pages/top-bar/top-bar.component';
 import { MainEditorComponent } from './views/pages/main-editor/main-editor.component';
 import { PropertiesComponent } from './views/pages/properties/properties.component';
 import { FolderComponent } from './views/pages/folder/folder.component';
+import { PreviewComponent } from './views/pages/preview/preview.component';
+import { ElementService } from './services/element/element.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { FolderService } from './services/folder/folder.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, ElementToolbarComponent, TopBarComponent, MainEditorComponent, PropertiesComponent, FolderComponent],
+  imports: [RouterOutlet, CommonModule, FormsModule, ReactiveFormsModule, PreviewComponent, ElementToolbarComponent, TopBarComponent, MainEditorComponent, PropertiesComponent, FolderComponent, MatButtonModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  title = 'ReportDesignerv16';
+
+  previewMode: boolean = false;
+
+  constructor(private elementService: ElementService, private folderService: FolderService) {
+    this.elementService.previewMode.asObservable().subscribe(res => {
+      this.previewMode = res;
+    })
+  }
+
+  goBackEdit() {
+    this.elementService.previewMode.next(false);
+    this.folderService.save.next(false);
+  }
+
 }

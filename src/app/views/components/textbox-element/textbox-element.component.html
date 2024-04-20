@@ -1,9 +1,4 @@
 <input type="text" [value]="options.text" [(ngModel)]="text" (ngModelChange)="onChange()"
     [style.fontSize.px]="options.fontSize" [style.color]="options.fontColor" [minLength]="options.minLength"
     [maxLength]="options.maxLength" [readOnly]="options.readOnly" [required]="options.required"
-    [style.width.px]="style.width" [style.height.px]="style.height" *ngIf="styleRelative === null ">
-
-<input type="text" [value]="options.text" [(ngModel)]="text" (ngModelChange)="onChange()"
-    [style.fontSize.px]="options.fontSize" [style.color]="options.fontColor" [minLength]="options.minLength"
-    [maxLength]="options.maxLength" [readOnly]="options.readOnly" [required]="options.required"
-    [style.width.%]="styleRelative.width" [style.height.%]="styleRelative.height" *ngIf="styleRelative !== null">
+    [style.width.px]="style.width" [style.height.px]="style.height">

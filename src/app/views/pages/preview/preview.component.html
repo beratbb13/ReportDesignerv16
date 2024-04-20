@@ -1,0 +1,117 @@
+<div #content id="content" style="
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: auto;
+    width: 100%;
+    height: 90vh;
+  ">
+    <form (submit)="formSubmit()">
+        <div class="example-boundary" *ngIf="elements.length" #boundaryRef>
+            @for(elementRef of elements; track elementRef){
+            <div #wrapper class="frame-wrapper example-box"
+                style="position: absolute; background-color: transparent !important;" [ngStyle]="{
+        'left.px': elementRef.position.x,
+        'top.px': elementRef.position.y
+      }">
+                <div class="content-wrapper"
+                    style="display: flex; justify-content: center; align-items: center; overflow: hidden;  background-color: transparent !important;"
+                    [style.width.px]="elementRef.style.width" [style.height.px]="elementRef.style.height">
+
+                    <label *ngIf="elementRef.tag === 'label'" style="align-content: center;"
+                        [style.width.px]=" elementRef.style.width" [style.height.px]="elementRef.style.height"
+                        [style.fontSize.px]="elementRef.style.fontSize" [style.color]="elementRef.style.color"
+                        [style.backgroundColor]="elementRef.style.backgroundColor"
+                        [style.fontWeight]="elementRef.style.fontWeight" [style.fontStyle]="elementRef.style.fontStyle"
+                        [style.textDecoration]="elementRef.style.textDecoration"
+                        [style.textAlign]="elementRef.style.textAlign"> {{ elementRef.attributes.value
+                        }} </label>
+
+                    <input [id]="elementRef.id"
+                        *ngIf="elementRef.tag === 'input' && (elementRef.attributes.type === 'text' || elementRef.attributes.type === 'number' || elementRef.attributes.type === 'date')"
+                        [class]="elementRef.formControlName" [name]="elementRef.attributes.name"
+                        [style.width.px]=" elementRef.style.width" [style.height.px]="elementRef.style.height"
+                        [style.fontSize.px]="elementRef.style.fontSize" [style.color]="elementRef.style.color"
+                        [style.backgroundColor]="elementRef.style.backgroundColor"
+                        [style.fontWeight]="elementRef.style.fontWeight" [style.fontStyle]="elementRef.style.fontStyle"
+                        [style.textDecoration]="elementRef.style.textDecoration"
+                        [style.textAlign]="elementRef.style.textAlign" [style.fontFamily]="elementRef.style.fontFamily"
+                        [type]="elementRef.attributes.type" [value]="elementRef.attributes.value"
+                        [readonly]="elementRef.attributes.readonly" [required]="elementRef.attributes.required"
+                        [placeholder]="elementRef.attributes.placeholder"
+                        [autocomplete]="elementRef.attributes.autocomplete"
+                        [autocapitalize]="elementRef.attributes.autocapitalize"
+                        [style.borderRadius.px]="elementRef.style.borderRadius"
+                        [style.border]="elementRef.style.border">
+
+                    <img [id]="elementRef.id" *ngIf="elementRef.tag === 'img'" [src]="elementRef.attributes.src"
+                        [name]="elementRef.attributes.name" [alt]="elementRef.attributes.alt"
+                        [style.width.px]="elementRef.style.width" [style.height.px]="elementRef.style.height"
+                        [title]="elementRef.attributes.title" [loading]="elementRef.attributes.loading"
+                        [style.borderRadius.px]="elementRef.style.borderRadius" [style.border]="elementRef.style.border"
+                        [decoding]="elementRef.attributes.decoding">
+
+                    <select [id]="elementRef.id" *ngIf="elementRef.tag === 'select'"
+                        [class]="elementRef.formControlName" [style.width.px]="elementRef.style.width"
+                        [name]="elementRef.attributes.name" [style.height.px]="elementRef.style.height"
+                        [style.fontSize.px]="elementRef.style.fontSize" [style.color]="elementRef.style.color"
+                        [style.backgroundColor]="elementRef.style.backgroundColor"
+                        [style.fontWeight]="elementRef.style.fontWeight" [style.fontStyle]="elementRef.style.fontStyle"
+                        [style.textDecoration]="elementRef.style.textDecoration"
+                        [style.textAlign]="elementRef.style.textAlign"
+                        [style.borderRadius.px]="elementRef.style.borderRadius" [style.border]="elementRef.style.border"
+                        [style.fontFamily]="elementRef.style.fontFamily">
+                        @for(option of elementRef.options; track option){
+                        <option [value]="option.value"> {{ option.value}} </option>
+                        }
+                    </select>
+
+                    <span *ngIf="elementRef.tag === 'input' && elementRef.attributes.type === 'checkbox'"
+                        class="d-flex justify-content-center align-items-center"
+                        [style.width.px]="elementRef.style.width" [style.height.px]="elementRef.style.height"
+                        [style.backgroundColor]="elementRef.style.backgroundColor">
+                        <input [type]="elementRef.attributes.type" [disabled]="elementRef.attributes.disabled"
+                            [style.width.px]="elementRef.style.height" [style.height.px]="elementRef.style.height"
+                            [style.borderRadius.px]="elementRef.style.borderRadius"
+                            [style.border]="elementRef.style.border">
+                        &nbsp;
+                        <label [style.fontSize.px]="elementRef.style.fontSize" [style.color]="elementRef.style.color"
+                            [style.backgroundColor]="elementRef.style.backgroundColor"
+                            [style.fontWeight]="elementRef.style.fontWeight"
+                            [style.fontStyle]="elementRef.style.fontStyle"
+                            [style.textDecoration]="elementRef.style.textDecoration"
+                            [style.textAlign]="elementRef.style.textAlign"> {{
+                            elementRef.attributes.value }} </label>
+                    </span>
+
+                    <span *ngIf="elementRef.tag === 'input' && elementRef.attributes.type === 'radio'"
+                        class="d-flex justify-content-center align-items-center"
+                        [style.width.px]="elementRef.style.width" [style.height.px]="elementRef.style.height"
+                        [style.backgroundColor]="elementRef.style.backgroundColor">
+                        <input [type]="elementRef.attributes.type" [name]="elementRef.attributes.name"
+                            [style.width.px]="elementRef.style.height" [style.height.px]="elementRef.style.height"
+                            [style.borderRadius.px]="elementRef.style.borderRadius"
+                            [style.border]="elementRef.style.border" [disabled]="elementRef.attributes.disabled">
+                        &nbsp;
+                        <label [style.fontSize.px]="elementRef.style.fontSize" [style.color]="elementRef.style.color"
+                            [style.fontWeight]="elementRef.style.fontWeight"
+                            [style.fontStyle]="elementRef.style.fontStyle"
+                            [style.textDecoration]="elementRef.style.textDecoration"
+                            [style.textAlign]="elementRef.style.textAlign"> {{
+                            elementRef.attributes.value }} </label>
+                    </span>
+
+                    <button *ngIf="elementRef.tag === 'button'" [style.width.px]="elementRef.style.width"
+                        [style.height.px]="elementRef.style.height" [style.color]="elementRef.style.color"
+                        [style.fontSize.px]="elementRef.style.fontSize"
+                        [style.backgroundColor]="elementRef.style.backgroundColor" [type]="elementRef.attributes.type"
+                        [style.borderRadius.px]="elementRef.style.borderRadius"
+                        [style.textDecoration]="elementRef.style.textDecoration"
+                        [style.border]="elementRef.style.border">{{
+                        elementRef.attributes.value }}</button>
+                </div>
+            </div>
+            }
+        </div>
+    </form>
+</div>

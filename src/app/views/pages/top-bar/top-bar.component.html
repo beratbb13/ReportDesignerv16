@@ -1,13 +1,13 @@
-<nav class="navbar navbar-light bg-light">
+<nav class="navbar navbar-light bg-light p-2" style="background-color:rgba(187, 120, 36, 0.1) !important;">
   <button mat-button [matMenuTriggerFor]="menu">File</button>
   <mat-menu #menu="matMenu">
     <button mat-menu-item (click)="openModal(true)">New</button>
     <button mat-menu-item (click)="openModal(false)">Open</button>
   </mat-menu>
-  <!--<button mat-button *ngIf="selectedFile.fileId">{{ selectedFile.name }}</button>-->
   <button mat-button>Share</button>
   <button mat-button>Results</button>
   <button mat-button>Settings</button>
+  <button mat-button (click)="showOnPreview()">Preview</button>
   <button mat-button (click)="saveChanges()">Save</button>
 </nav>
 
@@ -36,19 +36,52 @@
     <div class="modal-content" style="width: 100%;">
       <div class="modal-header d-flex justify-content-between" style="width: 100%;">
         <h5 class="modal-title" id="exampleModalLabel" style="font-size: 20px; display: flex; align-items: center;">
-          Yeni Dosya Oluştur</h5>
+          Create a new file</h5>
         <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" (click)="closeModal()">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body" style="width: 100%; height: calc(100% - 56px); overflow-y: auto;">
-        <div class="form-group mb-2">
-          <label>Dosya Adı</label>
+        <div class="form-group mb-4">
+          <label class="mb-1">Filename</label>
           <input type="text" class="form-control" [(ngModel)]="newFileName">
         </div>
         <div class="form-group d-flex justify-content-center">
-          <button type="submit" class="btn btn-primary" (click)="crateNewFile()">Onayla</button>
+          <button type="submit" class="btn btn-primary" (click)="crateNewFile()">Confirm</button>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal" tabindex="-1" role="dialog" id="previewModal" #previewModal
+  style="display: none; justify-content: center; align-items: center;">
+  <div class="modal-dialog" role="document" style="width: 100%;">
+    <div class="modal-content" style="width: 100%;">
+      <div class="modal-header d-flex justify-content-between" style="width: 100%;">
+      </div>
+      <div class="modal-body" style="width: 100%; height: calc(100% - 56px); overflow-y: auto;">
+        <form [formGroup]="previewForm">
+          @for (formGroup of prevcontrols.controls; let i = $index; track formGroup){
+          <div class="form-group mb-1" style="padding-bottom: 5px;">
+            <label class="mb-1" style="width: 100%; display: flex; justify-content: center; font-size: 15px;">{{
+              getFormControlKey(formGroup) }}</label>
+            @switch(getFormControlValue(formGroup).value){
+            @case('Label'){
+            <input type="text" style="border: none;" class="form-control mb-1"
+              [formControl]="getFormControlValue(formGroup)" />
+            }
+            @case('Button'){
+            <button type="button" class="form-control mb-1" [formControl]="getFormControlValue(formGroup)"> </button>
+            }
+            @default{
+            <input type="text" class="form-control mb-1" [formControl]="getFormControlValue(formGroup)" />
+            }
+            }
+          </div>
+          }
+        </form>
       </div>
     </div>
   </div>

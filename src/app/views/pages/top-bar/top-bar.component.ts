@@ -3,10 +3,11 @@ import { FolderService } from '../../../services/folder/folder.service';
 import { file, folder } from '../../../entities/customElements';
 import { SubFileComponent } from '../sub-file/sub-file.component';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
+import { ElementService } from '../../../services/element/element.service';
 
 @Component({
   selector: 'app-top-bar',
@@ -20,6 +21,7 @@ export class TopBarComponent {
 
   @ViewChild('modal') modal!: ElementRef;
   @ViewChild('modal_second') modal_second!: ElementRef;
+  @ViewChild('previewModal') previewModal!: ElementRef;
   @ViewChild(SubFileComponent) subFileComponent!: SubFileComponent;
 
   folders: folder[] = [];
@@ -29,7 +31,7 @@ export class TopBarComponent {
   showFileCreator: boolean = false;
   newFileName: string = '';
 
-  constructor(private folderService: FolderService, private dialogService: DialogService) {
+  constructor(private folderService: FolderService, private dialogService: DialogService, private elementService: ElementService, private fb: FormBuilder) {
     this.folderService.folders.asObservable().subscribe(res => this.folders = res);
 
     this.dialogService.isOpen.asObservable().subscribe(res => {
@@ -57,13 +59,24 @@ export class TopBarComponent {
 
   isNew: boolean = false;
   modalHeader: string = '';
+  previewForm!: FormGroup;
+
+  ngOnInit() {
+    this.previewForm = this.fb.group({
+      prevcontrols: this.fb.array([])
+    });
+  }
+
+  get prevcontrols(): FormArray {
+    return this.previewForm.get('prevcontrols') as FormArray;
+  }
 
   openModal(boolean: boolean) {
     this.subFileComponent.count = 0;
     if (boolean) {
-      this.modalHeader = 'Klasör Seçiniz';
+      this.modalHeader = 'Choose a folder';
     } else {
-      this.modalHeader = "Dosya Seçiniz";
+      this.modalHeader = "Choose a file";
     }
     this.isNew = boolean;
     this.modal.nativeElement.style.display = 'block';
@@ -129,18 +142,6 @@ export class TopBarComponent {
     this.closeModal();
   }
 
-
-  /*findFile(folder: folder) {
-    let founded = this.folders.filter(folder => {
-      return folder.files = folder.files.filter(file => file.fileId == this.selectedFileId);
-    });
-    if (founded.length == 0) {
-      return null;
-    } else {
-      return founded[0];
-    }
-  }*/
-
   printFilesInFolders(folder: any, indentation = 0) {
     console.log(' '.repeat(indentation * 4) + folder.folderName);
 
@@ -177,4 +178,21 @@ export class TopBarComponent {
     this.folderService.saveFile();
   }
 
+  showOnPreview() {
+    this.folderService.save.next(true);
+    this.elementService.previewMode.next(true);
+  }
+
+  getFormControlKey(formGroup: AbstractControl): string {
+    return Object.keys(formGroup.value)[0];
+  }
+
+  getFormControlValue(formGroup: AbstractControl): FormControl {
+    return formGroup.get(Object.keys(formGroup.value)[0]) as FormControl;
+  }
+
+  getFormControlValue_(controlId: string): any {
+    const control = this.prevcontrols.controls.find(c => c.value.id === controlId);
+    return control ? control.value.value : null;
+  }
 }

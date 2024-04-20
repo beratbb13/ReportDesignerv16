@@ -5,67 +5,124 @@
     align-items: center;
     overflow: auto;
     width: 100%;
-    height: 80vh;
+    height: 90vh;
   ">
   <div class="example-boundary" *ngIf="elements.length" #boundaryRef>
     @for(elementRef of elements; track elementRef){
-    <div #wrapper class="frame-wrapper" class="example-box" cdkDragBoundary=".example-boundary" cdkDrag [ngStyle]="{
+    <div #wrapper class="frame-wrapper example-box"
+      style="position: absolute; background-color: transparent !important;" cdkDragBoundary=".example-boundary" cdkDrag
+      [ngStyle]="{
         'left.px': elementRef.position.x,
         'top.px': elementRef.position.y
-      }" [cdkDragDisabled]="elementRef.isDragDisabled" (cdkDragEnded)="onDragEnded($event, elementRef)">
-      <div class="content-wrapper" [style.width.px]="elementRef.style.width" [style.height.px]="elementRef.style.height"
-        [ngStyle]="{ cursor: elementRef.isDragDisabled ? 'pointer' : 'move' }"
-        style="display: flex; justify-content: center; align-items: center; overflow: hidden;"
+      }" [cdkDragDisabled]="isDragDisabled" (cdkDragEnded)="onDragEnded($event, elementRef)">
+
+      <div class="content-wrapper"
+        style="display: flex; justify-content: center; align-items: center; overflow: hidden;  background-color: transparent !important;"
+        [style.width.px]="elementRef.style.width" [style.height.px]="elementRef.style.height"
         (contextmenu)="removeElement($event, elementRef)">
 
-        <app-textbox-element [options]="elementRef.element" [style]="elementRef.style"
-          *ngIf="elementRef.label.toLowerCase() == 'textbox'" (click)="onFocus(elementRef)"></app-textbox-element>
 
-        <app-button-element [options]="elementRef.element" [style]="elementRef.style"
-          *ngIf="elementRef.label.toLowerCase() == 'button'" (click)="onFocus(elementRef)"></app-button-element>
+        <label *ngIf="elementRef.tag === 'label'" style="align-content: center;"
+          [style.width.px]=" elementRef.style.width" [style.height.px]="elementRef.style.height"
+          [style.fontSize.px]="elementRef.style.fontSize" [style.color]="elementRef.style.color"
+          [style.backgroundColor]="elementRef.style.backgroundColor" [style.fontWeight]="elementRef.style.fontWeight"
+          [style.fontStyle]="elementRef.style.fontStyle" [style.textDecoration]="elementRef.style.textDecoration"
+          [style.textAlign]="elementRef.style.textAlign" (dblclick)="isDragDisabled = !isDragDisabled"
+          (click)="onFocus(elementRef)"> {{ elementRef.attributes.value
+          }} </label>
 
-        <app-checkbox-element [options]="elementRef.element" [style]="elementRef.style"
-          *ngIf="elementRef.label.toLowerCase() == 'checkbox'" (click)="onFocus(elementRef)"></app-checkbox-element>
+        <input
+          *ngIf="elementRef.tag === 'input' && (elementRef.attributes.type === 'text' || elementRef.attributes.type === 'number' || elementRef.attributes.type === 'date')"
+          [style.width.px]=" elementRef.style.width" [style.height.px]="elementRef.style.height"
+          [style.fontSize.px]="elementRef.style.fontSize" [style.color]="elementRef.style.color"
+          [style.backgroundColor]="elementRef.style.backgroundColor" [style.fontWeight]="elementRef.style.fontWeight"
+          [style.fontStyle]="elementRef.style.fontStyle" [style.textDecoration]="elementRef.style.textDecoration"
+          [style.textAlign]="elementRef.style.textAlign" [style.fontFamily]="elementRef.style.fontFamily"
+          [type]="elementRef.attributes.type" [value]="elementRef.attributes.value"
+          [readonly]="elementRef.attributes.readonly" [required]="elementRef.attributes.required"
+          [placeholder]="elementRef.attributes.placeholder" [autocomplete]="elementRef.attributes.autocomplete"
+          [autocapitalize]="elementRef.attributes.autocapitalize"
+          [style.borderRadius.px]="elementRef.style.borderRadius" [style.border]="elementRef.style.border"
+          [attr.aria-describedby]="elementRef.attributes.ariaDescribedby" (dblclick)="isDragDisabled = !isDragDisabled"
+          (click)="onFocus(elementRef)">
 
-        <app-combobox-element [options]="elementRef.element" [style]="elementRef.style"
-          *ngIf="elementRef.label.toLowerCase() == 'combobox'" (click)="onFocus(elementRef)"></app-combobox-element>
+        <img *ngIf="elementRef.tag === 'img'" [src]="elementRef.attributes.src" [alt]="elementRef.attributes.alt"
+          [style.width.px]="elementRef.style.width" [style.height.px]="elementRef.style.height"
+          [title]="elementRef.attributes.title" [loading]="elementRef.attributes.loading"
+          [style.borderRadius.px]="elementRef.style.borderRadius" [style.border]="elementRef.style.border"
+          [decoding]="elementRef.attributes.decoding" [draggable]="elementRef.attributes.draggable"
+          (dblclick)="isDragDisabled = !isDragDisabled" (click)="onFocus(elementRef)">
 
-        <app-image-element [options]="elementRef.element" [style]="elementRef.style"
-          *ngIf="elementRef.label.toLowerCase() == 'image'" (click)="onFocus(elementRef)"></app-image-element>
 
-        <app-label-element [options]="elementRef.element" [style]="elementRef.style"
-          *ngIf="elementRef.label.toLowerCase() == 'label'" (click)="onFocus(elementRef)"></app-label-element>
+        <select *ngIf="elementRef.tag === 'select'" [style.width.px]="elementRef.style.width"
+          [style.height.px]="elementRef.style.height" [style.fontSize.px]="elementRef.style.fontSize"
+          [style.color]="elementRef.style.color" [style.backgroundColor]="elementRef.style.backgroundColor"
+          [style.fontWeight]="elementRef.style.fontWeight" [style.fontStyle]="elementRef.style.fontStyle"
+          [style.textDecoration]="elementRef.style.textDecoration" [style.textAlign]="elementRef.style.textAlign"
+          [style.borderRadius.px]="elementRef.style.borderRadius" [style.border]="elementRef.style.border"
+          [style.fontFamily]="elementRef.style.fontFamily" (dblclick)="isDragDisabled = !isDragDisabled"
+          (click)="onFocus(elementRef)">
+          @for(option of elementRef.options; track option){
+          <option> {{ option.value}} </option>
+          }
+        </select>
 
-        <app-link-element [options]="elementRef.element" [style]="elementRef.style"
-          *ngIf="elementRef.label.toLowerCase() == 'link'" (click)="onFocus(elementRef)"></app-link-element>
+        <button *ngIf="elementRef.tag === 'button'" [style.width.px]="elementRef.style.width"
+          [style.height.px]="elementRef.style.height" [style.color]="elementRef.style.color"
+          [style.fontSize.px]="elementRef.style.fontSize" [style.backgroundColor]="elementRef.style.backgroundColor"
+          [type]="elementRef.attributes.type" [style.textAlign]="elementRef.style.textAlign"
+          [style.borderRadius.px]="elementRef.style.borderRadius" [style.border]="elementRef.style.border"
+          [disabled]="elementRef.attributes.disabled" (click)="onFocus(elementRef)"
+          (dblclick)="isDragDisabled = !isDragDisabled">{{
+          elementRef.attributes.value }}</button>
 
-        <app-listbox-element [options]="elementRef.element" [style]="elementRef.style"
-          *ngIf="elementRef.label.toLowerCase() == 'listbox'" (click)="onFocus(elementRef)"></app-listbox-element>
+        <span *ngIf="elementRef.tag === 'input' && elementRef.attributes.type === 'checkbox'"
+          (click)="onFocus(elementRef)" (dblclick)="isDragDisabled = !isDragDisabled"
+          class="d-flex justify-content-center align-items-center" [style.width.px]="elementRef.style.width"
+          [style.height.px]="elementRef.style.height" [style.backgroundColor]="elementRef.style.backgroundColor">
+          <input [type]="elementRef.attributes.type" [disabled]="elementRef.attributes.disabled"
+            [style.width.px]="elementRef.style.height" [style.height.px]="elementRef.style.height"
+            [style.borderRadius.px]="elementRef.style.borderRadius" [style.border]="elementRef.style.border">
+          &nbsp;
+          <label [style.fontSize.px]="elementRef.style.fontSize" [style.color]="elementRef.style.color"
+            [style.backgroundColor]="elementRef.style.backgroundColor" [style.fontWeight]="elementRef.style.fontWeight"
+            [style.fontStyle]="elementRef.style.fontStyle" [style.textDecoration]="elementRef.style.textDecoration"
+            [style.textAlign]="elementRef.style.textAlign"> {{
+            elementRef.attributes.value }} </label>
+        </span>
 
-        <app-radio-element [options]="elementRef.element" [style]="elementRef.style"
-          *ngIf="elementRef.label.toLowerCase() == 'radio button'" (click)="onFocus(elementRef)"></app-radio-element>
+        <span *ngIf="elementRef.tag === 'input' && elementRef.attributes.type === 'radio'" (click)="onFocus(elementRef)"
+          (dblclick)="isDragDisabled = !isDragDisabled" class="d-flex justify-content-center align-items-center"
+          [style.width.px]="elementRef.style.width" [style.height.px]="elementRef.style.height"
+          [style.backgroundColor]="elementRef.style.backgroundColor">
+          <input [type]="elementRef.attributes.type" [name]="elementRef.attributes.name"
+            [style.width.px]="elementRef.style.height" [style.height.px]="elementRef.style.height"
+            [style.borderRadius.px]="elementRef.style.borderRadius" [style.border]="elementRef.style.border"
+            [disabled]="elementRef.attributes.disabled">
+          &nbsp;
+          <label [style.fontSize.px]="elementRef.style.fontSize" [style.color]="elementRef.style.color"
+            [style.fontWeight]="elementRef.style.fontWeight" [style.fontStyle]="elementRef.style.fontStyle"
+            [style.textDecoration]="elementRef.style.textDecoration" [style.textAlign]="elementRef.style.textAlign"> {{
+            elementRef.attributes.value }} </label>
+        </span>
 
-        <app-table-element [options]="elementRef.element" [elementRef]="elementRef" [style]="elementRef.style"
-          style="position: absolute;" [style.left.px]="elementRef.position.x" [style.top.px]="elementRef.position.y"
-          *ngIf="elementRef.label.toLowerCase() == 'table'" (click)="tableRenderer(elementRef)"></app-table-element>
-
-        <app-textarea-element [options]="elementRef.element" [style]="elementRef.style"
-          *ngIf="elementRef.label.toLowerCase() == 'textarea'" (click)="onFocus(elementRef)"></app-textarea-element>
       </div>
       <div class="resizers" [style.width.px]="elementRef.style.width" [style.height.px]="elementRef.style.height">
         <div (mousedown)="
             startResize($event, 'x', elementRef);
-            elementRef.isDragDisabled = true
-          " (mouseup)="elementRef.isDragDisabled = false" class="resizer right"></div>
+            isDragDisabled = true
+          " (mouseup)="isDragDisabled = false" class="resizer right">
+        </div>
 
         <div #resizeCorner (mousedown)="
             startResize($event, 'y', elementRef);
-            elementRef.isDragDisabled = true
-          " (mouseup)="elementRef.isDragDisabled = false" class="resizer bottom"></div>
+            isDragDisabled = true
+          " (mouseup)="isDragDisabled = false" class="resizer bottom">
+        </div>
         <div #resizeCorner (mousedown)="
             startResize($event, 'xy', elementRef);
-            elementRef.isDragDisabled = true
-          " (mouseup)="elementRef.isDragDisabled = false" class="resizer bottom-right"></div>
+            isDragDisabled = true
+          " (mouseup)="isDragDisabled = false" class="resizer bottom-right"></div>
       </div>
     </div>
     }

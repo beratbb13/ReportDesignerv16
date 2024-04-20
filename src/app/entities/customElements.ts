@@ -81,6 +81,7 @@ export interface listbox {
 export interface htmlTemplate {
     id?: number,
     label: string,
+    tag: string,
     icon?: string,
     style: {
         width: number,

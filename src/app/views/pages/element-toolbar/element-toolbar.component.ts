@@ -1,177 +1,123 @@
-import { Component, ViewChild } from '@angular/core';
-import { CdkDragDrop, CdkDropList, CdkDragPreview, CdkDrag, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
+import { CdkDragDrop, CdkDropList, CdkDragPreview, CdkDrag, transferArrayItem } from '@angular/cdk/drag-drop';
 import { FormsModule } from '@angular/forms';
 import { ElementService } from '../../../services/element/element.service';
-import { button, checkbox, combobox, htmlTemplate, image, label, link, listbox, radioButton, table, textarea, textbox } from '../../../entities/customElements';
-import { MainEditorComponent } from '../main-editor/main-editor.component';
 import { FolderService } from '../../../services/folder/folder.service';
 import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-element-toolbar',
   standalone: true,
-  imports: [CdkDropList, CdkDrag, CdkDragPreview, FormsModule, CommonModule],
+  imports: [CdkDropList, CdkDrag, CdkDragPreview, FormsModule, CommonModule, MatCardModule, MatButtonModule],
   templateUrl: './element-toolbar.component.html',
-  styleUrl: './element-toolbar.component.css'
+  styleUrl: './element-toolbar.component.css',
+  schemas: [NO_ERRORS_SCHEMA]
 })
 export class ElementToolbarComponent {
 
   editorProperties: any = {};
   draggable: boolean = false;
+  searchBar: string = '';
+  filteredElements: any[] = [];
+  addedElements: any[] = [];
+  elements: any[] =
+    [
+      {
+        name: 'Label',
+        tag: 'label',
+        icon: 'fa-solid fa-tag',// 'assets/label.png',
+        attributes: {
+          value: 'label',
+        }
+      },
+      {
+        name: 'Textbox',
+        tag: 'input',
+        icon: 'fa-solid fa-text-width',//'assets/textbox.png',
+        attributes: {
+          type: 'text',
+          value: '',
+          disabled: false,
+          readonly: false,
+          autofocus: false,
+          required: false,
+          minlength: 0,
+          maxlength: 100,
+          placeholder: '',
+        }
+      },
+      {
+        name: 'Image',
+        tag: 'img',
+        icon: 'fa-solid fa-image',//'assets/image.png',
+        attributes: {
+          src: '',
+          alt: '',
+          loading: 'auto',
+          decoding: 'auto',
+        }
+      },
+      {
+        name: 'Selectbox',
+        tag: 'select',
+        icon: 'fa-solid fa-list',// 'assets/combobox.png',
+        options: [],
+        attributes: {
+          disabled: false,
+          multiple: false,
+        }
+      },
+      {
+        name: 'Button',
+        tag: 'button',
+        icon: 'fa-solid fa-play', // 'assets/button.png',
+        attributes: {
+          value: 'Button',
+          type: 'submit',
+          disabled: false,
+        }
+      },
+      {
+        name: 'Checkbox',
+        icon: 'fa-solid fa-square-check',//'assets/checkbox.png',
+        tag: 'input',
+        attributes: {
+          type: 'checkbox',
+          value: 'checkbox',
+          disabled: false,
+          name: 'name'
+        }
+      },
+      {
+        name: 'Radio',
+        tag: 'input',
+        icon: 'fa-regular fa-circle-dot',// 'assets/radio.png',
+        attributes: {
+          type: 'radio',
+          value: 'radio',
+          disabled: false,
+          name: 'name'
+        }
+      }
+    ];
+
   constructor(private elementService: ElementService, private folderService: FolderService) {
     this.folderService.content.asObservable().subscribe(res => this.editorProperties = res);
-
 
     this.folderService.selectedFile.asObservable().subscribe(res => {
       if (res.fileId != 0)
         this.draggable = true;
-    })
+    });
   }
-
-  searchBar: string = '';
-  filteredElements: any[] = [];
 
   search() {
     this.filteredElements = this.elements.filter(el => {
-      let lowerBase = el.label.toLocaleLowerCase();
+      let lowerBase = el.name.toLocaleLowerCase();
       return lowerBase.includes(this.searchBar.toLocaleLowerCase())
     })
   }
-
-  elements: htmlTemplate[] = [
-    {
-      label: 'Label', icon: 'assets/label.png', element: {
-        text: 'label_1',
-        fontSize: 14,
-        fontColor: 'black'
-      } as label, style: {
-        width: 100,
-        height: 25
-      }, isDragDisabled: false
-    },
-    {
-      label: 'Textbox', icon: 'assets/textbox.png',
-      element: {
-        text: 'textbox',
-        fontSize: 14,
-        fontColor: 'black',
-        minLength: 0,
-        maxLength: 100,
-        readonly: false,
-        required: false
-      } as textbox, style: {
-        width: 100,
-        height: 25
-      }, isDragDisabled: false
-    },
-    {
-      label: 'Textarea', icon: 'https://www.svgrepo.com/show/345207/textarea.svg',
-      element: {
-        text: 'textarea',
-        fontSize: 14,
-        fontColor: 'black',
-        minLength: 0,
-        maxLength: 200,
-        readonly: false,
-        required: false
-      } as textarea, style: {
-        width: 100,
-        height: 25
-      }, isDragDisabled: false
-    },
-    /*{
-      label: 'Table', icon: 'assets/table.png',
-      element: {
-        captions: {
-          cells: ['Ad', 'Takma isim']
-        },
-        row: [
-          { cells: ['Berat', 'bb13'] }, { cells: ['Çiftci'] }, { cells: ['Gelişim', 'Üniversitesi'] }
-        ]
-      } as table, style: {
-        width: 250,
-        height: 50
-      }, isDragDisabled: false
-    },*/
-    {
-      label: 'Combobox', icon: 'assets/combobox.png',
-      element: {
-        fontColor: 'red',
-        fontSize: 14,
-        options: [
-          { value: 'Option 1', text: 'Option 1' },
-          { value: 'Option 2', text: 'Option 2' },
-          { value: 'Option 3', text: 'Option 3' },
-        ]
-      } as combobox, style: {
-        width: 130,
-        height: 40
-      }, isDragDisabled: false
-    },
-    {
-      label: 'Checkbox', icon: 'assets/checkbox.png', element: {
-        text: 'checkbox',
-        fontSize: 14,
-        fontColor: 'red',
-        readonly: false
-      } as checkbox, style: {
-        width: 100,
-        height: 25
-      }, isDragDisabled: false
-    },
-    {
-      label: 'Radio Button', icon: 'assets/radio.png', element: {
-        text: 'radio',
-        fontSize: 15,
-        fontColor: 'black'
-      } as radioButton, style: {
-        width: 100,
-        height: 25
-      }, isDragDisabled: false
-    },
-    {
-      label: 'Image', icon: 'assets/image.png', element: {
-        src: '',
-        width: 100,
-        height: 100
-      } as image, style: {
-        width: 100,
-        height: 25
-      }, isDragDisabled: false
-    },
-    {
-      label: 'Link', icon: 'assets/link.png', element: {
-        url: 'www.google.com'
-      } as link, style: {
-        width: 100,
-        height: 25
-      }, isDragDisabled: false
-    },
-    {
-      label: 'Button', icon: 'assets/button.png', element: {
-        text: 'button',
-        disabled: false
-      } as button, style: {
-        width: 100,
-        height: 25
-      }, isDragDisabled: false
-    },
-    {
-      label: 'Listbox', icon: 'assets/listbox.png', element: {
-        fontColor: 'red',
-        fontSize: 14,
-        options: [
-          { value: 'option1', text: 'option 1' },
-          { value: 'option2', text: 'option 2' }
-        ]
-      } as listbox, style: {
-        width: 100,
-        height: 25
-      }, isDragDisabled: false
-    }
-  ];
-
-  addedElements: any[] = [];
 
   ngOnInit() {
     this.filteredElements = this.elements;
@@ -195,8 +141,8 @@ export class ElementToolbarComponent {
 
     let clientX = newEvent.clientX;
     let clientY = newEvent.clientY;
-    let clientMaxWidth = element.style.width;
-    let clientMaxHeight = element.style.height;
+    let clientMaxWidth = 150;//element.style.width;
+    let clientMaxHeight = 35;//element.style.height;
 
     let minX = this.editorProperties.x
     let minY = this.editorProperties.y

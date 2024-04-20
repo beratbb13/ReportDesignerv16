@@ -1,7 +1,7 @@
 import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import { ElementService } from '../../../services/element/element.service';
 import { CdkDrag, CdkDragEnd } from '@angular/cdk/drag-drop';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { TextareaElementComponent } from '../../components/textarea-element/textarea-element.component';
 import { ButtonElementComponent } from '../../components/button-element/button-element.component';
@@ -16,9 +16,9 @@ import { RadioElementComponent } from '../../components/radio-element/radio-elem
 import { TableElementComponent } from '../../components/table-element/table-element.component';
 import { TextboxElementComponent } from '../../components/textbox-element/textbox-element.component';
 import { FolderService } from '../../../services/folder/folder.service';
-import { file, htmlTemplate } from '../../../entities/customElements';
+import { file } from '../../../entities/customElements';
 
-export type ResizeDirectionType = 'x' | 'y' | 'xy';
+export type ResizeDirectionType = 'x' | 'y' | 'xy' | 't' | 'l';
 
 @Component({
   selector: 'app-main-editor',
@@ -26,7 +26,7 @@ export type ResizeDirectionType = 'x' | 'y' | 'xy';
   imports: [CdkDrag, FormsModule, CommonModule, TextareaElementComponent, ButtonElementComponent,
     CheckboxElementComponent, ComboboxElementComponent, ImageElementComponent, LabelElementComponent,
     LinkElementComponent, ListboxElementComponent, OptionElementComponent, RadioElementComponent,
-    TableElementComponent, TextboxElementComponent],
+    TableElementComponent, TextboxElementComponent, ReactiveFormsModule],
   templateUrl: './main-editor.component.html',
   styleUrl: './main-editor.component.css'
 })
@@ -34,17 +34,20 @@ export class MainEditorComponent {
 
   @ViewChild('boundaryRef') boundaryElement!: ElementRef;
   @ViewChild('content') content!: ElementRef;
+  @ViewChild('resizeCorner') resizeCornerRef!: ElementRef;
 
+  minSize: { w: number; h: number } = { w: 100, h: 25 };
   elements: any[] = [];
   selectedElementId!: number;
   fileId: number = 0;
+  isDragDisabled: boolean = false;
 
   constructor(
     private elementService: ElementService,
     private folderService: FolderService,
     @Inject(DOCUMENT) private _document: Document) {
 
-    this.elementService.elements.asObservable().subscribe(res => {
+    this.elementService.elements_.asObservable().subscribe(res => {
       this.elements = res;
     });
 
@@ -63,68 +66,89 @@ export class MainEditorComponent {
       }
     })
 
-
-
-
     this.folderService.save.asObservable().subscribe(res => {
       if (res) {
+        let isPreviewMode = this.elementService.previewMode.getValue();
 
-        const innerHTMLContent = this.content.nativeElement.innerHTML;
+        if (isPreviewMode) {
 
-        let contentHeight = this.content.nativeElement.clientHeight;
-        let contentWidth = this.content.nativeElement.clientWidth;
-        let contentXStart = this.content.nativeElement.offsetLeft;
-        let contentYStart = this.content.nativeElement.offsetTop;
-        let contentXEnd = contentWidth + contentXStart;
-        let contentYEnd = contentHeight + contentYStart;
+          let contentHeight = this.content.nativeElement.clientHeight;
+          let contentWidth = this.content.nativeElement.clientWidth;
+          let contentXStart = this.content.nativeElement.offsetLeft;
+          let contentYStart = this.content.nativeElement.offsetTop;
 
-        this.elements.forEach(element => {
-          console.log(element.position);
-          let elementX = element.position.x;
-          let elementY = element.position.y;
+          this.elements.forEach(element => {
+            let elementX = element.position.x;
+            let elementY = element.position.y;
 
-          let relativeX = ((elementX - contentXStart) / contentWidth) * 100;
-          let relativeY = ((elementY - contentYStart) / contentHeight) * 100;
+            let relativeX = ((elementX - contentXStart) / contentWidth) * 100;
+            let relativeY = ((elementY - contentYStart) / contentHeight) * 100;
 
-          element.positionRelative = {
-            x: relativeX,
-            y: relativeY
-          }
+            element.positionRelative = {
+              x: relativeX,
+              y: relativeY
+            }
 
-          let elementStyleWidth = parseFloat(element.style.width);
-          let elementStyleHeight = parseFloat(element.style.height);
+            let elementStyleWidth = parseFloat(element.style.width);
+            let elementStyleHeight = parseFloat(element.style.height);
 
-          /*
-          let widthRatio = Math.round((elementStyleWidth / contentWidth) * 100);
-          let heightRatio = Math.round((elementStyleHeight / contentHeight) * 100);
-          */
+            let widthRatio = (elementStyleWidth / contentWidth) * 100;
+            let heightRatio = (elementStyleHeight / contentHeight) * 100;
 
-          let widthRatio = (elementStyleWidth / contentWidth) * 100;
-          let heightRatio = (elementStyleHeight / contentHeight) * 100;
+            element.styleRelative = {
+              width: widthRatio,
+              height: heightRatio
+            }
 
+          });
 
-          element.styleRelative = {
-            width: widthRatio,
-            height: heightRatio
-          }
+          this.elementService.selectedElement.next(null);
 
-          /*element.style = {
-            width: Math.round((contentWidth * widthRatio) / 100),
-            height: Math.round((contentHeight * heightRatio) / 100)
-          }*/
-        });
+        } else {
 
-        this.elementService.elements.next(this.elements);
-        this.elementService.saveLayout();
+          let contentHeight = this.content.nativeElement.clientHeight;
+          let contentWidth = this.content.nativeElement.clientWidth;
+          let contentXStart = this.content.nativeElement.offsetLeft;
+          let contentYStart = this.content.nativeElement.offsetTop;
+
+          this.elements.forEach(element => {
+            let elementX = element.position.x;
+            let elementY = element.position.y;
+
+            let relativeX = ((elementX - contentXStart) / contentWidth) * 100;
+            let relativeY = ((elementY - contentYStart) / contentHeight) * 100;
+
+            element.positionRelative = {
+              x: relativeX,
+              y: relativeY
+            }
+
+            let elementStyleWidth = parseFloat(element.style.width);
+            let elementStyleHeight = parseFloat(element.style.height);
+
+            let widthRatio = (elementStyleWidth / contentWidth) * 100;
+            let heightRatio = (elementStyleHeight / contentHeight) * 100;
+
+            element.styleRelative = {
+              width: widthRatio,
+              height: heightRatio
+            }
+
+          });
+
+          this.elementService.selectedElement.next(null);
+          this.elementService.elements.next(this.elements);
+          this.elementService.saveLayout();
+        }
       }
     })
   }
 
-
   removeElement(event: MouseEvent, element: any) {
     event.preventDefault();
     let filtered = this.elements.filter(el => el.id !== element.id);
-    this.elementService.elements.next(filtered);
+    this.elementService.elements_.next(filtered);
+    this.elementService.selectedElement.next(null);
 
   }
 
@@ -136,21 +160,20 @@ export class MainEditorComponent {
   }
 
   onFocus(element: any) {
-    if (element.id !== this.selectedElementId) {
-      this.elementService.selectedElement.next(element);
-      this.selectedElementId = element.id;
-    }
+    this.elementService.selectedElement.next(element);
+    this.selectedElementId = element.id;
   }
-
-  @ViewChild('resizeCorner') resizeCornerRef!: ElementRef;
-
-  minSize: { w: number; h: number } = { w: 100, h: 25 };
 
   onDragEnded(event: CdkDragEnd, elementRef: any): void {
     const dW = elementRef.position.x + event.distance.x;
     const dH = elementRef.position.y + event.distance.y;
 
-    console.log(event);
+    let screenX, screenY;
+
+    if (event.event instanceof MouseEvent) {
+      screenX = event.event.screenX;
+      screenY = event.event.screenY;
+    }
 
     let contentHeight = this.content.nativeElement.clientHeight;
     let contentWidth = this.content.nativeElement.clientWidth;
@@ -161,11 +184,18 @@ export class MainEditorComponent {
 
     if ((dW > contentXStart && dW < contentXEnd) &&
       (dH > contentYStart && dH < contentYEnd)) {
-      /*elementRef.position = {
-        x: dW,
-        y: dH
-      };*/
+      elementRef.position = {
+        x: screenX,
+        y: screenY
+      };
     }
+
+    let index = this.elements.findIndex(el => el.id === elementRef.id);
+    if (index !== -1) {
+      this.elements[index] = elementRef;
+    }
+
+    this.elementService.elements_.next(this.elements);
   }
 
   startResize(
@@ -173,21 +203,17 @@ export class MainEditorComponent {
     direction: ResizeDirectionType,
     element: any
   ): void {
-
-    const x = $event.x;
-    const y = element.y;
+    this.isDragDisabled = true;
 
     element.isDragDisabled = true;
     const mouseX = $event.clientX;
     const mouseY = $event.clientY;
-
     const dimensionWidth =
       this.resizeCornerRef.nativeElement.parentNode.offsetWidth;
     const dimensionHeight =
       this.resizeCornerRef.nativeElement.parentNode.offsetHeight;
 
     const duringResize = (e: any) => {
-
       let dw = dimensionWidth;
       let dh = dimensionHeight;
       let contentHeight = this.content.nativeElement.clientHeight;
@@ -221,8 +247,10 @@ export class MainEditorComponent {
       }
     };
 
+    this.elementService.selectedElement.next(element);
+
     const finishResize = (e: any) => {
-      element.isDragDisabled = false;
+      this.isDragDisabled = false;
       this._document.removeEventListener('mousemove', duringResize);
       this._document.removeEventListener('mouseup', finishResize);
     };
@@ -231,7 +259,6 @@ export class MainEditorComponent {
     this._document.addEventListener('mouseup', finishResize);
   }
 
-
   contentJSON: any;
 
   createForm(response: file) {
@@ -239,23 +266,32 @@ export class MainEditorComponent {
     try {
       if (response.content.length)
         parsedJson = JSON.parse(response.content);
-      this.elementService.elements.next(parsedJson);
+      if (parsedJson.length) {
+
+        let contentHeight = this.content.nativeElement.clientHeight;
+        let contentWidth = this.content.nativeElement.clientWidth;
+        let contentXStart = this.content.nativeElement.offsetLeft;
+        let contentYStart = this.content.nativeElement.offsetTop;
+        let contentXEnd = contentWidth + contentXStart;
+        let contentYEnd = contentHeight + contentYStart;
+
+        parsedJson.forEach((element: any) => {
+          if (element.positionRelative && element.styleRelative) {
+            element.position = {
+              x: Math.round(((element.positionRelative.x * (contentXEnd - contentXStart)) / 100) + contentXStart),
+              y: Math.round(((element.positionRelative.y * (contentYEnd - contentYStart)) / 100) + contentYStart)
+            }
+
+            element.style.width = Math.round((contentWidth * element.styleRelative.width) / 100);
+            element.style.height = Math.round((contentHeight * element.styleRelative.height) / 100);
+          }
+        });
+      }
+
+      this.elementService.elements_.next(parsedJson);
     } catch (exception) {
-      this.contentJSON = 'Maalesef duzgun yuklenmedi';
+      this.contentJSON = 'Error';
     }
-  }
-
-  tableRenderer(elementRef: any) {
-    /*elementRef.element.captions.cells.map((c: any, i: number) => {
-      console.log('Caption', i, ': ', c);
-    })
-    elementRef.element.row.map((row: any, i: number) => {
-      row?.cells.forEach((cell: any, i: number) => {
-        console.log(cell, ':', i);
-      })
-      console.log('satır sonu');
-    })*/
-
   }
 
 }

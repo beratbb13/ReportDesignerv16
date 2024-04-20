@@ -1,40 +1,129 @@
-<div style="overflow-y: auto; padding: 10px; border: 1px solid black; border-top-left-radius: 10px; border-bottom-left-radius: 10px; width: 100%; height: 90vh"
-    *ngIf="selectedElement !== null" (focusout)="onSubmit()">
-    <nav class="navbar navbar-light bg-light">
-        <!--<button mat-button (click)="removeElement()">Remove</button>-->
-    </nav>
+<div style="overflow-y: auto; padding: 15px; background-color: rgb(196, 196, 196); height: 100vh"
+    *ngIf="selectedElement !== null">
     <form [formGroup]="propertyForm">
+        <div class="form-group mb-1" style="padding-bottom: 5px;" *ngIf="controlName === 'textbox' || controlName === 'checkbox' ||
+        controlName === 'radio' || controlName === 'selectbox'">
+            <label style="width: 100%; font-size: 15px;">
+                Database Column Name</label>
+            <input type="text" class="form-control" style="border-radius: 0; padding: 5px;" [(ngModel)]="form_Control"
+                [ngModelOptions]="{standalone: true}" />
+        </div>
         @for (formGroup of properties.controls; let i = $index; track formGroup){
-        <div class="form-group mb-1" style="padding-bottom: 5px;">
-            <label class="mb-1" style="width: 100%; display: flex; justify-content: center; font-size: 15px;">{{
+        <div class=" form-group mb-1" style="padding-bottom: 5px;">
+            <label style="width: 100%; font-size: 15px;">{{
                 getFormControlKey(formGroup) }}</label>
             @switch(getControlTypeByAttributeName(getFormControlKey(formGroup))){
             @case ('text'){
-            <input type="text" class="form-control mb-1" [maxlength]="getMaxLength()" [minlength]="getMinLength()"
-                [formControl]="getFormControlValue(formGroup)" />
+            <input type="text" class="form-control" style="border-radius: 0; padding: 5px;" [maxlength]="getMaxLength()"
+                [minlength]="getMinLength()" [formControl]="getFormControlValue(formGroup)" />
             } @case ('number'){
-            <input type="number" class="form-control mb-1" [max]="getMax()" [min]="getMin()"
-                [formControl]="getFormControlValue(formGroup)" />
+            <input type="number" class="form-control" style="border-radius: 0; padding: 5px;" [max]="getMax()"
+                [min]="getMin()" [formControl]="getFormControlValue(formGroup)" />
             } @case ('color'){
-            <input type="color" class="form-control form-control-color mb-1"
+            <input type="color" class="form-control" style="border-radius: 0; padding: 5px;"
                 [formControl]="getFormControlValue(formGroup)" />
             } @case ('file'){
-            <input type="file" accept=".png, .jpg, .jpeg" class="form-control mb-1"
-                [formControl]="getFormControlValue(formGroup)" (change)="onFileSelected($event, formGroup)" />
-            } @case ('boolean'){ &nbsp;&nbsp;&nbsp;<input type="checkbox" class="form-control form-check-input mb-1 p-2"
-                [formControl]="getFormControlValue(formGroup)" />
-            <br />
+            <input type="file" accept=".png, .jpg, .jpeg" class="form-control" style="border-radius: 0; padding: 5px;"
+                (change)="onFileSelected($event, formGroup)" />
+            }@case ('select'){
+            <select class="form-select" style="border-radius: 0; padding: 5px;"
+                [formControl]="getFormControlValue(formGroup)">
+                <option value="text">text</option>
+                <option value="number">number</option>
+                <option value="date">date</option>
+                <option value="range">range</option>
+            </select>
+            }
+            @case ('boolean'){
+            <select class="form-select" style="border-radius: 0; padding: 5px;"
+                [formControl]="getFormControlValue(formGroup)">
+                <option value="true">true</option>
+                <option value="false">false</option>
+            </select>
             }
             @default {
-            <input type="text" class="form-control mb-1" [formControl]="getFormControlValue(formGroup)" />
+            <input type="text" class="form-control" style="border-radius: 0; padding: 5px;"
+                [formControl]="getFormControlValue(formGroup)" />
             }
             }
         </div>
         }
     </form>
+    <form [formGroup]="propertyForm">
+        @for (formGroup of styles.controls; let i = $index; track formGroup){
+        <div class="form-group mb-1" style="padding-bottom: 5px;">
+            <label style="width: 100%; font-size: 15px;">{{
+                getFormControlKey(formGroup) }}</label>
+            @switch(getControlTypeByAttributeName(getFormControlKey(formGroup))){
+            @case ('text'){
+            <input type="text" class="form-control" style="border-radius: 0; padding: 5px;" [maxlength]="getMaxLength()"
+                [minlength]="getMinLength()" [formControl]="getFormControlValue(formGroup)" />
+            } @case ('number'){
+            <input type="number" class="form-control" style="border-radius: 0; padding: 5px;" [max]="getMax()"
+                [min]="getMin()" [formControl]="getFormControlValue(formGroup)" />
+            } @case ('color'){
+            <input type="color" class="form-control" style="border-radius: 0; padding: 5px;"
+                [formControl]="getFormControlValue(formGroup)" />
+            } @case ('file'){
+            <input type="file" accept=".png, .jpg, .jpeg" class="form-control" style="border-radius: 0; padding: 5px;"
+                (change)="onFileSelected($event, formGroup)" />
+            }
+            @case ('boolean'){
+            <select class="form-select" style="border-radius: 0; padding: 5px;"
+                [formControl]="getFormControlValue(formGroup)">
+                <option value="true">true</option>
+                <option value="false">false</option>
+            </select>
+            }
+            @default {
+            <input type="text" class="form-control" style="border-radius: 0; padding: 5px;"
+                [formControl]="getFormControlValue(formGroup)" />
+            }
+            }
+        </div>
+        }
+    </form>
+    <br>
+
+    <div class="form-group mb-1 d-flex justify-content-center" style="padding-bottom: 5px;"
+        *ngIf="this.selectedElement.name === 'Selectbox'">
+        <label>Items</label>
+    </div>
+    <div class="form-group" *ngIf="this.selectedElement.name === 'Selectbox'">
+        <form [formGroup]="propertyForm">
+            @for (formGroup of items.controls; let i = $index; track formGroup){
+            <div class="form-group mb-1" style="padding-bottom: 5px;">
+                <label style="width: 100%; font-size: 15px; margin-bottom: 3px;">{{
+                    getFormControlKey(formGroup) }}. Item</label>
+                <div class="d-flex justify-content-between align-items-center">
+                    <input class="form-control" type="text" style="border-radius: 0; padding: 5px;"
+                        [formControl]="getFormControlValue(formGroup)" />
+                    &nbsp;&nbsp;
+                    <button class="btn btn-danger" style="border-radius: 0px; 
+              background-color: white !important; color: black !important" (click)="removeItem(formGroup)">Del
+                    </button>
+                </div>
+            </div>
+            }
+            <br>
+            <div class="mb-3 d-flex justify-content-end" style="padding-bottom: 5px;">
+                <span style="border-radius: 0px; cursor: pointer; font-size: 15px;
+             border-bottom: 2px solid blue; color: black !important" (click)="addItem()">Add Item</span>
+            </div>
+        </form>
+    </div>
+
+    <div class="form-group d-flex justify-content-center align-items-center mb-2">
+        <span style="border-radius: 0px; cursor: pointer; font-size: 15px;
+             border-bottom: 2px solid blue; color: black !important" (click)="onSubmit()"
+            *ngIf="properties.controls.length > 0">Save Changes</span>
+    </div>
 </div>
 
-<div style="overflow-y: auto; padding: 10px; border: 1px solid black; border-top-left-radius: 10px; border-bottom-left-radius: 10px; width: 100%; height: 45vh;
- display: flex; justify-content: center; align-items: center;" *ngIf="selectedElement === null">
-    Henüz bir element seçilmedi.
+<div style="overflow-y: auto; padding: 10px; 
+ background-color: rgb(196, 196, 196); height: 100vh;
+display: flex; justify-content: center; align-items: center; 
+overflow-y: auto; padding: 15px; background-color: rgb(196, 196, 196); height: 100vh;"
+    *ngIf="selectedElement === null">
+    Properties
 </div>
