@@ -54,7 +54,8 @@ export class TopBarComponent {
       if (res) {
         this.selectedFile = res;
       }
-    })
+    });
+
   }
 
   isNew: boolean = false;
@@ -82,11 +83,99 @@ export class TopBarComponent {
     this.modal.nativeElement.style.display = 'block';
   }
 
+  enteredFolderName: string = '';
+  buttonInnerHtml: any = {
+    id: 0,
+    text: 'Add a folder',
+    inActive: false
+  }
+
+  enteredFolderNameChanged() {
+    if (this.enteredFolderName.length > 0) {
+      this.buttonInnerHtml = {
+        id: 1,
+        text: 'Confirm',
+        inActive: false
+      }
+
+      let isUnique: boolean = true;
+      this.folders.forEach(folder => {
+        if (folder.folderName === this.enteredFolderName) {
+          isUnique = false;
+          return;
+        }
+        folder.folders.forEach(subfolder => {
+          if (subfolder.folderName === this.enteredFolderName) {
+            isUnique = false;
+            return;
+          }
+        })
+        folder.files.forEach(file => {
+          if (file.name === this.enteredFolderName) {
+            isUnique = false;
+            return;
+          }
+        });
+      });
+
+      if (!isUnique) {
+        this.buttonInnerHtml.inActive = true;
+      }
+
+    } else {
+      this.buttonInnerHtml = {
+        id: 0,
+        text: 'Add a folder',
+        inActive: false
+      };
+
+    }
+
+  }
+
+  isShouldBeCreated: boolean = false;
+
+  checkNewFileName() {
+
+    let isUnique: boolean = true;
+    this.folders.forEach(folder => {
+      if (folder.folderName === this.newFileName) {
+        isUnique = false;
+        return;
+      }
+      folder.folders.forEach(subfolder => {
+        if (subfolder.folderName === this.newFileName) {
+          isUnique = false;
+          return;
+        }
+      })
+      folder.files.forEach(file => {
+        if (file.name === this.newFileName) {
+          isUnique = false;
+          return;
+        }
+      });
+    });
+
+    if (!isUnique) {
+      this.isShouldBeCreated = false;
+    } else {
+      this.isShouldBeCreated = true;
+    }
+  }
+
   closeModal() {
     this.modal_second.nativeElement.style.display = 'none';
     this.modal.nativeElement.style.display = 'none';
     this.subFileComponent.count = 0;
     this.newFileName = '';
+    this.folderService.tempSelectedFolder.next(null);
+    this.message = { id: 0, text: '' };
+    this.buttonInnerHtml = {
+      id: 0,
+      text: 'Add a folder',
+      inActive: false
+    }
   }
 
   expand(folder: folder) {
@@ -194,5 +283,39 @@ export class TopBarComponent {
   getFormControlValue_(controlId: string): any {
     const control = this.prevcontrols.controls.find(c => c.value.id === controlId);
     return control ? control.value.value : null;
+  }
+
+  message: any = { id: 0, text: '' };
+
+  checkTempSelectedFolder() {
+    if (this.buttonInnerHtml.id === 0) {
+      this.buttonInnerHtml.inActive = false;
+      let folder = this.folderService.tempSelectedFolder.getValue();
+      if (folder === null) {
+        this.message.text = 'Firstly you must choose a folder path';
+      } else {
+        this.message = {
+          id: 1,
+          text: folder.folderName
+        };
+      }
+    } else if (this.buttonInnerHtml.id === 1 && this.buttonInnerHtml.inActive === false) {
+      let folder = this.folderService.tempSelectedFolder.getValue();
+
+      if (folder !== null) {
+        const newFolder: folder = {
+          id: 88,
+          folderName: this.enteredFolderName,
+          files: [],
+          folders: [],
+          isOpen: true
+        }
+        let stat = this.folderService.addFolderByFolderId(folder.id, newFolder);
+
+        if (stat) {
+          this.closeModal();
+        }
+      }
+    }
   }
 }

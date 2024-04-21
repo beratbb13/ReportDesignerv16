@@ -106,7 +106,6 @@ export class PreviewComponent {
         });
         console.log(classList + ": " + (element as HTMLSelectElement).value);
       }
-      // Diğer form elemanları
     }
 
   }

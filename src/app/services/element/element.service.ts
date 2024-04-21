@@ -147,6 +147,9 @@ export class ElementService {
     if (file)
       this.folderService.selectedFile.next(file);
 
+    console.log(file);
+    console.dir(JSON.parse(file.content))
+
   }
 
   setSelectedElement(elementRef: any) {

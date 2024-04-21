@@ -16,14 +16,18 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 export class SubFileComponent {
 
   constructor(private folderService: FolderService, private dialogService: DialogService) {
+    this.folderService.tempSelectedFolder.asObservable().subscribe(res => this.tempSelectedFolder = res?.folderName);
+
+    console.log(this.count)
   }
 
   @Input() folder!: folder;
   @Input() paddingLeft: any;
   @Input() toggle: boolean = false;
   @Input() showFiles: boolean = false;
+  @Input() tempSelectedFolder: string | undefined = undefined;
 
-  public count: number = 0;
+  public count: number = 1;
 
   ngOnChanges() {
     this.count++
@@ -38,6 +42,16 @@ export class SubFileComponent {
   chooseFolder(folder: folder | null) {
     if (folder)
       this.folderService.selectedFolder.next(folder);
+    this.tempSelectedFolder = undefined;
+  }
+
+  selectFolder() {
+    this.folderService.tempSelectedFolder.next(this.folder);
+  }
+
+  selectFile(file: file) {
+    this.folderService.selectedFile.next(file);
+    this.tempSelectedFolder = undefined;
   }
 
 }

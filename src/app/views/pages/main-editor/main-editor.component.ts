@@ -115,25 +115,24 @@ export class MainEditorComponent {
             let elementX = element.position.x;
             let elementY = element.position.y;
 
-            let relativeX = ((elementX - contentXStart) / contentWidth) * 100;
-            let relativeY = ((elementY - contentYStart) / contentHeight) * 100;
+            let relativeX = parseInt((((elementX - contentXStart) / contentWidth) * 100).toFixed(2));
+            let relativeY = parseInt((((elementY - contentYStart) / contentHeight) * 100).toFixed(2));
 
             element.positionRelative = {
               x: relativeX,
               y: relativeY
-            }
+            };
 
             let elementStyleWidth = parseFloat(element.style.width);
             let elementStyleHeight = parseFloat(element.style.height);
 
-            let widthRatio = (elementStyleWidth / contentWidth) * 100;
-            let heightRatio = (elementStyleHeight / contentHeight) * 100;
+            let widthRatio = parseInt(((elementStyleWidth / contentWidth) * 100).toFixed(2));
+            let heightRatio = parseInt(((elementStyleHeight / contentHeight) * 100).toFixed(2));
 
             element.styleRelative = {
               width: widthRatio,
               height: heightRatio
-            }
-
+            };
           });
 
           this.elementService.selectedElement.next(null);
