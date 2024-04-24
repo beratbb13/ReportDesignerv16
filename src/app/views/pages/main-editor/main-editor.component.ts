@@ -16,7 +16,6 @@ import { RadioElementComponent } from '../../components/radio-element/radio-elem
 import { TableElementComponent } from '../../components/table-element/table-element.component';
 import { TextboxElementComponent } from '../../components/textbox-element/textbox-element.component';
 import { FolderService } from '../../../services/folder/folder.service';
-import { file } from '../../../entities/customElements';
 
 export type ResizeDirectionType = 'x' | 'y' | 'xy' | 't' | 'l';
 
@@ -41,106 +40,85 @@ export class MainEditorComponent {
   selectedElementId!: number;
   fileId: number = 0;
   isDragDisabled: boolean = false;
+  contentHeight: number = 0;
+  contentWidth: number = 0;
+  contentXStart: number = 0;
+  contentYStart: number = 0;
+  contentXEnd: number = 0;
+  contentYEnd: number = 0;
 
   constructor(
     private elementService: ElementService,
     private folderService: FolderService,
     @Inject(DOCUMENT) private _document: Document) {
+  }
 
-    this.elementService.elements_.asObservable().subscribe(res => {
-      this.elements = res;
+  ngAfterViewInit() {
+    this.contentHeight = this.content.nativeElement.clientHeight;
+    this.contentWidth = this.content.nativeElement.clientWidth;
+    this.contentXStart = this.content.nativeElement.offsetLeft;
+    this.contentYStart = this.content.nativeElement.offsetTop;
+    this.contentXEnd = this.contentWidth + this.contentXStart;
+    this.contentYEnd = this.contentHeight + this.contentYStart;
+
+    this.folderService.content.next({
+      x: this.content.nativeElement.offsetLeft, y: this.content.nativeElement.offsetTop,
+      width: this.content.nativeElement.clientWidth, height: this.content.nativeElement.clientHeight
     });
-
-    this.folderService.selectedFolder.asObservable().subscribe(res => {
-      if (res) {
-        this.folderService.createNewFile();
-      }
-    })
-
-    this.folderService.selectedFile.asObservable().subscribe(res => {
-      if (res.fileId > 0) {
-        this.fileId = res.fileId;
-        this.createForm(res);
-      } else {
-        this.contentJSON = 'Choose a file';
-      }
-    })
 
     this.folderService.save.asObservable().subscribe(res => {
       if (res) {
         let isPreviewMode = this.elementService.previewMode.getValue();
 
-        if (isPreviewMode) {
+        this.elements.forEach(element => {
+          let elementX = element.position.x;
+          let elementY = element.position.y;
 
-          let contentHeight = this.content.nativeElement.clientHeight;
-          let contentWidth = this.content.nativeElement.clientWidth;
-          let contentXStart = this.content.nativeElement.offsetLeft;
-          let contentYStart = this.content.nativeElement.offsetTop;
+          let relativeX = ((elementX - this.contentXStart) / this.contentWidth) * 100;
+          let relativeY = ((elementY - this.contentYStart) / this.contentHeight) * 100;
 
-          this.elements.forEach(element => {
-            let elementX = element.position.x;
-            let elementY = element.position.y;
+          element.positionRelative = {
+            x: relativeX,
+            y: relativeY
+          }
 
-            let relativeX = ((elementX - contentXStart) / contentWidth) * 100;
-            let relativeY = ((elementY - contentYStart) / contentHeight) * 100;
+          let elementStyleWidth = parseFloat(element.style.width);
+          let elementStyleHeight = parseFloat(element.style.height);
 
-            element.positionRelative = {
-              x: relativeX,
-              y: relativeY
-            }
+          let widthRatio = (elementStyleWidth / this.contentWidth) * 100;
+          let heightRatio = (elementStyleHeight / this.contentHeight) * 100;
 
-            let elementStyleWidth = parseFloat(element.style.width);
-            let elementStyleHeight = parseFloat(element.style.height);
+          element.styleRelative = {
+            width: widthRatio,
+            height: heightRatio
+          }
 
-            let widthRatio = (elementStyleWidth / contentWidth) * 100;
-            let heightRatio = (elementStyleHeight / contentHeight) * 100;
-
-            element.styleRelative = {
-              width: widthRatio,
-              height: heightRatio
-            }
-
-          });
-
-          this.elementService.selectedElement.next(null);
-
-        } else {
-
-          let contentHeight = this.content.nativeElement.clientHeight;
-          let contentWidth = this.content.nativeElement.clientWidth;
-          let contentXStart = this.content.nativeElement.offsetLeft;
-          let contentYStart = this.content.nativeElement.offsetTop;
-
-          this.elements.forEach(element => {
-            let elementX = element.position.x;
-            let elementY = element.position.y;
-
-            let relativeX = parseInt((((elementX - contentXStart) / contentWidth) * 100).toFixed(2));
-            let relativeY = parseInt((((elementY - contentYStart) / contentHeight) * 100).toFixed(2));
-
-            element.positionRelative = {
-              x: relativeX,
-              y: relativeY
-            };
-
-            let elementStyleWidth = parseFloat(element.style.width);
-            let elementStyleHeight = parseFloat(element.style.height);
-
-            let widthRatio = parseInt(((elementStyleWidth / contentWidth) * 100).toFixed(2));
-            let heightRatio = parseInt(((elementStyleHeight / contentHeight) * 100).toFixed(2));
-
-            element.styleRelative = {
-              width: widthRatio,
-              height: heightRatio
-            };
-          });
-
-          this.elementService.selectedElement.next(null);
+        });
+        this.elementService.selectedElement.next(null);
+        if (!isPreviewMode) {
           this.elementService.elements.next(this.elements);
           this.elementService.saveLayout();
         }
       }
-    })
+    });
+
+    this.folderService.selectedFile.asObservable().subscribe(res => {
+      if (res !== null) {
+        this.fileId = res.fileId;
+        if (JSON.parse(res.content).length) {
+          this.createForm(JSON.parse(res.content));
+        }
+      }
+    });
+
+    /*this.elementService.previewMode.asObservable().subscribe(isPreviewMode => {
+      if (!isPreviewMode) {
+        let res = this.elementService.elements_.getValue();
+        this.elements = res;
+        if (res.length)
+          this.createForm(res);
+      }
+    });*/
   }
 
   removeElement(event: MouseEvent, element: any) {
@@ -148,14 +126,6 @@ export class MainEditorComponent {
     let filtered = this.elements.filter(el => el.id !== element.id);
     this.elementService.elements_.next(filtered);
     this.elementService.selectedElement.next(null);
-
-  }
-
-  ngAfterViewInit() {
-    this.folderService.content.next({
-      x: this.content.nativeElement.offsetLeft, y: this.content.nativeElement.offsetTop,
-      width: this.content.nativeElement.clientWidth, height: this.content.nativeElement.clientHeight
-    })
   }
 
   onFocus(element: any) {
@@ -164,6 +134,41 @@ export class MainEditorComponent {
   }
 
   onDragEnded(event: CdkDragEnd, elementRef: any): void {
+    /*const dW = elementRef.position.x + event.distance.x;
+    const dH = elementRef.position.y + event.distance.y;
+    let screenX, screenY;
+
+    if (event.event instanceof MouseEvent) {
+      screenX = event.event.screenX;
+      screenY = event.event.screenY;
+    }
+
+    if ((dW > this.contentXStart && dW < this.contentXEnd) &&
+      (dH > this.contentYStart && dH < this.contentYEnd)) {
+      elementRef.position = {
+        x: screenX,
+        y: screenY
+      };
+
+      let relativeX = ((elementRef.position.x - this.contentXStart) / this.contentWidth) * 100;
+      let relativeY = ((elementRef.position.y - this.contentYStart) / this.contentHeight) * 100;
+
+      elementRef.positionRelative = {
+        x: relativeX,
+        y: relativeY
+      }
+      console.log('screenX', screenX);
+      console.log('screenY', screenY);
+    }
+
+    let index = this.elements.findIndex(el => el.id === elementRef.id);
+    if (index !== -1) {
+      this.elements[index] = elementRef;
+    }
+    console.log(this.elements);
+    this.elementService.elements_.next(this.elements);
+    */
+
     const dW = elementRef.position.x + event.distance.x;
     const dH = elementRef.position.y + event.distance.y;
 
@@ -174,19 +179,20 @@ export class MainEditorComponent {
       screenY = event.event.screenY;
     }
 
-    let contentHeight = this.content.nativeElement.clientHeight;
-    let contentWidth = this.content.nativeElement.clientWidth;
-    let contentXStart = this.content.nativeElement.offsetLeft + elementRef.style.width;
-    let contentYStart = this.content.nativeElement.offsetTop + elementRef.style.height;
-    let contentXEnd = contentWidth + contentXStart - elementRef.style.width;
-    let contentYEnd = contentHeight + contentYStart - elementRef.style.height;
-
-    if ((dW > contentXStart && dW < contentXEnd) &&
-      (dH > contentYStart && dH < contentYEnd)) {
+    if ((dW > this.contentXStart && dW < this.contentXEnd) &&
+      (dH > this.contentYStart && dH < this.contentYEnd)) {
       elementRef.position = {
         x: screenX,
         y: screenY
       };
+
+      let relativeX = ((elementRef.position.x - this.contentXStart) / this.contentWidth) * 100;
+      let relativeY = ((elementRef.position.y - this.contentYStart) / this.contentHeight) * 100;
+
+      /*elementRef.positionRelative = {
+        x: relativeX,
+        y: relativeY
+      }*/
     }
 
     let index = this.elements.findIndex(el => el.id === elementRef.id);
@@ -203,7 +209,6 @@ export class MainEditorComponent {
     element: any
   ): void {
     this.isDragDisabled = true;
-
     element.isDragDisabled = true;
     const mouseX = $event.clientX;
     const mouseY = $event.clientY;
@@ -215,32 +220,22 @@ export class MainEditorComponent {
     const duringResize = (e: any) => {
       let dw = dimensionWidth;
       let dh = dimensionHeight;
-      let contentHeight = this.content.nativeElement.clientHeight;
-      let contentWidth = this.content.nativeElement.clientWidth;
-      let contentXStart = this.content.nativeElement.offsetLeft;
-      let contentYStart = this.content.nativeElement.offsetTop;
-      let contentXEnd = contentWidth + contentXStart;
-      let contentYEnd = contentHeight + contentYStart;
 
       if (
-        !(contentXEnd > e.clientX && e.clientX > contentXStart) ||
-        !(contentYEnd > e.clientY && e.clientY > contentYStart)
+        !(this.contentXEnd > e.clientX && e.clientX > this.contentXStart) ||
+        !(this.contentYEnd > e.clientY && e.clientY > this.contentYStart)
       ) {
         return;
       }
-
       if (direction === 'x' || direction === 'xy') {
         dw -= mouseX - e.clientX;
       }
-
       if (direction === 'y' || direction === 'xy') {
         dh -= mouseY - e.clientY;
       }
-
       if (dw > this.minSize.w) {
         element.style.width = dw;
       }
-
       if (dh > this.minSize.h) {
         element.style.height = dh;
       }
@@ -258,39 +253,22 @@ export class MainEditorComponent {
     this._document.addEventListener('mouseup', finishResize);
   }
 
-  contentJSON: any;
+  contentJSON: string = 'Choose a file';
 
-  createForm(response: file) {
-    let parsedJson: any;
-    try {
-      if (response.content.length)
-        parsedJson = JSON.parse(response.content);
-      if (parsedJson.length) {
-
-        let contentHeight = this.content.nativeElement.clientHeight;
-        let contentWidth = this.content.nativeElement.clientWidth;
-        let contentXStart = this.content.nativeElement.offsetLeft;
-        let contentYStart = this.content.nativeElement.offsetTop;
-        let contentXEnd = contentWidth + contentXStart;
-        let contentYEnd = contentHeight + contentYStart;
-
-        parsedJson.forEach((element: any) => {
-          if (element.positionRelative && element.styleRelative) {
-            element.position = {
-              x: Math.round(((element.positionRelative.x * (contentXEnd - contentXStart)) / 100) + contentXStart),
-              y: Math.round(((element.positionRelative.y * (contentYEnd - contentYStart)) / 100) + contentYStart)
-            }
-
-            element.style.width = Math.round((contentWidth * element.styleRelative.width) / 100);
-            element.style.height = Math.round((contentHeight * element.styleRelative.height) / 100);
+  createForm(parsedJson: any[]) {
+    if (parsedJson.length) {
+      parsedJson.forEach((element: any) => {
+        if (element.positionRelative && element.styleRelative) {
+          element.position = {
+            x: Math.round(((element.positionRelative.x * (this.contentXEnd - this.contentXStart)) / 100) + this.contentXStart),
+            y: Math.round(((element.positionRelative.y * (this.contentYEnd - this.contentYStart)) / 100) + this.contentYStart)
           }
-        });
-      }
-
-      this.elementService.elements_.next(parsedJson);
-    } catch (exception) {
-      this.contentJSON = 'Error';
+          element.style.width = Math.round((this.contentWidth * element.styleRelative.width) / 100);
+          element.style.height = Math.round((this.contentHeight * element.styleRelative.height) / 100);
+        }
+      });
     }
+    this.elementService.elements_.next(parsedJson);
+    //this.elementService.previewMode.next(true);
   }
-
 }

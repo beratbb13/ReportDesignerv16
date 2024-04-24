@@ -26,7 +26,22 @@ export class AppComponent {
   constructor(private elementService: ElementService, private folderService: FolderService) {
     this.elementService.previewMode.asObservable().subscribe(res => {
       this.previewMode = res;
-    })
+    });
+  }
+
+  ngOnInit() {
+    this.getSavedTemplate();
+  }
+
+  getSavedTemplate() {
+    this.folderService.getTemplateByuserName('beratbb13').subscribe(res => {
+      if (res.result == true && res.message) {
+        if (res.message.length) {
+          let response = res.message[0];
+          this.folderService.selectedFile.next({ fileId: response.id, name: response.name, content: response.content, isSelected: false })
+        }
+      }
+    });
   }
 
   goBackEdit() {

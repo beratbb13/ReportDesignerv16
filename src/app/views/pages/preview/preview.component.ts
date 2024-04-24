@@ -1,42 +1,38 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, NO_ERRORS_SCHEMA, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpService } from '../../../services/http/http.service';
+import { HttpClientModule } from '@angular/common/http';
 import { ElementService } from '../../../services/element/element.service';
-import { FolderService } from '../../../services/folder/folder.service';
 
 @Component({
   selector: 'app-preview',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, CommonModule],
+  imports: [FormsModule, ReactiveFormsModule, CommonModule, HttpClientModule],
   templateUrl: './preview.component.html',
   styleUrl: './preview.component.css',
   schemas: [NO_ERRORS_SCHEMA]
 })
 export class PreviewComponent {
-
-  constructor(private elementService: ElementService, private fileService: FolderService, private fb: FormBuilder) { }
+  constructor(private elementService: ElementService, private fb: FormBuilder, private http: HttpService) { }
 
   @ViewChild('content', { static: true }) content!: ElementRef;
-
   elements: any[] = [];
   myForm!: FormGroup;
   controlName: string = '';
-
+  endpoint_url: string = '';
+  method: string = '';
 
   ngOnInit() {
-
     this.myForm = this.fb.group({
       formArray: this.fb.array([])
     });
 
-    this.fileService.selectedFile.asObservable().subscribe(res => {
-      if (res.content.length) {
-        let elements = JSON.parse(res.content);
-        this.elements = elements;
-
-        this.createFormElements(elements);
-      }
-    })
+    this.elementService.elements_.asObservable().subscribe(res => {
+      this.elements = res;
+      console.log(res);
+      this.createFormElements(res);
+    });
   }
 
   get formArray() {
@@ -47,9 +43,15 @@ export class PreviewComponent {
     elements.forEach((element: any) => {
       this.controlName = element.name.toLowerCase();
 
+      if (this.controlName === 'button') {
+        this.endpoint_url = element.attributes.endPoint;
+        this.method = element.attributes.method.toLowerCase();
+      }
+
       let group: any;
 
-      if (this.controlName === 'checkbox' || this.controlName === 'radio' || this.controlName === 'textbox' || this.controlName === 'selectbox') {
+      if (this.controlName === 'checkbox' || this.controlName === 'radio' || this.controlName === 'textbox'
+        || this.controlName === 'selectbox') {
         group = this.fb.group({
           [element.formControlName]: [element.value]
         });
@@ -58,10 +60,8 @@ export class PreviewComponent {
           [element.id]: [element.value]
         });
       }
-
       this.formArray.push(group);
     })
-
   }
 
   getFormGroup(id: string) {
@@ -69,8 +69,8 @@ export class PreviewComponent {
   }
 
   formSubmit() {
-
     const formElements = document.forms[0].elements;
+    const formData: any = {};
 
     for (let i = 0; i < formElements.length; i++) {
       const element = formElements[i];
@@ -84,7 +84,10 @@ export class PreviewComponent {
             }
           });
 
-          console.log(classList + ": " + (element as HTMLInputElement).value);
+          let stringClassList = classList[0];
+
+          formData[stringClassList] = (element as HTMLInputElement).value;
+
         } else if (element.type === 'checkbox' || element.type === 'radio') {
           const classList = element.classList;
 
@@ -94,7 +97,10 @@ export class PreviewComponent {
             }
           });
 
-          console.log(classList + ": " + (element as HTMLInputElement).checked);
+          let stringClassList = classList[0];
+
+          formData[stringClassList] = (element as HTMLInputElement).checked;
+
         }
       } else if (element instanceof HTMLSelectElement) {
         const classList = element.classList;
@@ -104,11 +110,16 @@ export class PreviewComponent {
             classList.remove(className);
           }
         });
-        console.log(classList + ": " + (element as HTMLSelectElement).value);
+        let stringClassList = classList[0];
+
+        formData[stringClassList] = (element as HTMLSelectElement).value;
+
       }
     }
-
+    if (this.method === 'post') {
+      this.http.postApi(this.endpoint_url, formData).subscribe(res => console.log(res));
+    } else {
+      this.http.getApi(this.endpoint_url, formData).subscribe(res => console.log(res));
+    }
   }
-
-
 }

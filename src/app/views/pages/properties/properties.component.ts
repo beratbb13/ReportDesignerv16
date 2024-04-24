@@ -90,7 +90,9 @@ export class PropertiesComponent {
     formaction: 'text',
     formmethod: 'text',
     formnovalidate: 'boolean',
-    formtarget: 'text'
+    formtarget: 'text',
+    endPoint: 'text',
+    method: 'text'
   };
 
   controlName: string = '';

@@ -17,8 +17,6 @@ export class SubFileComponent {
 
   constructor(private folderService: FolderService, private dialogService: DialogService) {
     this.folderService.tempSelectedFolder.asObservable().subscribe(res => this.tempSelectedFolder = res?.folderName);
-
-    console.log(this.count)
   }
 
   @Input() folder!: folder;

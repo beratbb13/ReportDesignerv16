@@ -16,7 +16,6 @@ export class ElementService {
   }
 
   elements_: BehaviorSubject<htmlElements[]> = new BehaviorSubject<htmlElements[]>([]);
-
   selectedElement: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   elements: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
   previewMode: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -59,7 +58,7 @@ export class ElementService {
         fontWeight: '',
         fontStyle: '',
         textDecoration: '',
-        textAlign: 'left',
+        textAlign: 'center',
         border: '',
         borderRadius: 0,
         padding: 0,
@@ -97,7 +96,7 @@ export class ElementService {
       }
     } else if (element.name == 'Label') {
       element['style'] = {
-        width: 100,
+        width: 150,
         height: 30,
         fontSize: 13,
         color: 'black',
@@ -137,7 +136,8 @@ export class ElementService {
   saveLayout() {
     let file!: file;
     this.folderService.selectedFile.asObservable().subscribe(res => {
-      file = res;
+      if (res !== null)
+        file = res;
     })
     this.elements.asObservable().subscribe((data) => {
       if (file)
@@ -147,7 +147,9 @@ export class ElementService {
     if (file)
       this.folderService.selectedFile.next(file);
 
-    console.log(file);
+    this.folderService.saveTemplate(file, 'beratbb13').subscribe(res => {
+      console.log(res);
+    })
     console.dir(JSON.parse(file.content))
 
   }

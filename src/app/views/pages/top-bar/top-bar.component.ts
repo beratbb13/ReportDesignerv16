@@ -86,7 +86,7 @@ export class TopBarComponent {
   enteredFolderName: string = '';
   buttonInnerHtml: any = {
     id: 0,
-    text: 'Add a folder',
+    text: 'Add new folder',
     inActive: false
   }
 
@@ -125,7 +125,7 @@ export class TopBarComponent {
     } else {
       this.buttonInnerHtml = {
         id: 0,
-        text: 'Add a folder',
+        text: 'Add new folder',
         inActive: false
       };
 
@@ -173,7 +173,7 @@ export class TopBarComponent {
     this.message = { id: 0, text: '' };
     this.buttonInnerHtml = {
       id: 0,
-      text: 'Add a folder',
+      text: 'Add new folder',
       inActive: false
     }
   }

@@ -16,6 +16,14 @@ import { MatCardModule } from '@angular/material/card';
   schemas: [NO_ERRORS_SCHEMA]
 })
 export class ElementToolbarComponent {
+  constructor(private elementService: ElementService, private folderService: FolderService) {
+    this.folderService.content.asObservable().subscribe(res => this.editorProperties = res);
+
+    this.folderService.selectedFile.asObservable().subscribe(res => {
+      if (res != null)
+        this.draggable = true;
+    });
+  }
 
   editorProperties: any = {};
   draggable: boolean = false;
@@ -77,6 +85,9 @@ export class ElementToolbarComponent {
           value: 'Button',
           type: 'submit',
           disabled: false,
+          endPoint: '',
+          method: '',
+          // array parameters: []
         }
       },
       {
@@ -102,15 +113,6 @@ export class ElementToolbarComponent {
         }
       }
     ];
-
-  constructor(private elementService: ElementService, private folderService: FolderService) {
-    this.folderService.content.asObservable().subscribe(res => this.editorProperties = res);
-
-    this.folderService.selectedFile.asObservable().subscribe(res => {
-      if (res.fileId != 0)
-        this.draggable = true;
-    });
-  }
 
   search() {
     this.filteredElements = this.elements.filter(el => {
@@ -141,8 +143,8 @@ export class ElementToolbarComponent {
 
     let clientX = newEvent.clientX;
     let clientY = newEvent.clientY;
-    let clientMaxWidth = 150;//element.style.width;
-    let clientMaxHeight = 35;//element.style.height;
+    let clientMaxWidth = 150;
+    let clientMaxHeight = 35;
 
     let minX = this.editorProperties.x
     let minY = this.editorProperties.y
