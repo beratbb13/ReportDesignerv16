@@ -9,7 +9,7 @@
 </nav>
 
 <div class="modal" tabindex="-1" role="dialog" id="modal" #modal
-  style="margin-top: 5vh; display: none; justify-content: center; align-items: center;">
+  style="margin-top: 5vh; display: none; justify-content: center; align-items: center; max-height: 70vh;">
   <div class="modal-dialog" role="document" style="width: 100%;">
     <div class="modal-content" style="width: 100%;">
       <div class="modal-header" style="width: 100%;">
@@ -20,7 +20,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body" style="width: 100%; height: calc(100% - 56px); overflow-y: auto;">
+      <div class="modal-body" style="width: 100%; height: calc(100% - 56px); overflow-y: auto;" *ngIf="folders.length">
         <app-sub-file [folder]="folders[0]" [paddingLeft]="paddingLeftStart" [toggle]="toggle" [showFiles]="!isNew"
           [tempSelectedFolder]="undefined"></app-sub-file>
       </div>
@@ -34,7 +34,7 @@
         <button
           style="border-color: rgba(187, 120, 36, 0.1) !important; background-color: rgba(187, 120, 36, 0.1) !important; padding: 6px 12px !important;"
           (click)="checkTempSelectedFolder()" [disabled]="buttonInnerHtml.inActive === true"
-          [ngStyle]="{ 'background-color': buttonInnerHtml.inActive === true ? 'purple' : '' }">{{
+          [ngStyle]="{ 'background-color': buttonInnerHtml.inActive === true ? 'red' : '' }">{{
           buttonInnerHtml.text }}
         </button>
       </div>
@@ -43,7 +43,7 @@
 </div>
 
 <div class="modal" tabindex="-1" role="dialog" id="modal" #modal_second
-  style="display: none; justify-content: center; align-items: center;">
+  style="display: none; justify-content: center; align-items: center; max-height: 70vh;">
   <div class="modal-dialog" role="document" style="width: 100%;">
     <div class="modal-content" style="width: 100%;">
       <div class="modal-header d-flex justify-content-between" style="width: 100%;">
@@ -63,39 +63,6 @@
           <button type="submit" style="border-color: rgba(187, 120, 36, 0.1) !important; background-color: rgba(187, 120, 36, 0.1) !important; padding: 6px 12px !important;
            color: black !important;" (click)="crateNewFile()" [disabled]="!isShouldBeCreated">Confirm</button>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<div class="modal" tabindex="-1" role="dialog" id="previewModal" #previewModal
-  style="display: none; justify-content: center; align-items: center;">
-  <div class="modal-dialog" role="document" style="width: 100%;">
-    <div class="modal-content" style="width: 100%;">
-      <div class="modal-header d-flex justify-content-between" style="width: 100%;">
-      </div>
-      <div class="modal-body" style="width: 100%; height: calc(100% - 56px); overflow-y: auto;">
-        <form [formGroup]="previewForm">
-          @for (formGroup of prevcontrols.controls; let i = $index; track formGroup){
-          <div class="form-group mb-1" style="padding-bottom: 5px;">
-            <label class="mb-1" style="width: 100%; display: flex; justify-content: center; font-size: 15px;">{{
-              getFormControlKey(formGroup) }}</label>
-            @switch(getFormControlValue(formGroup).value){
-            @case('Label'){
-            <input type="text" style="border: none;" class="form-control mb-1"
-              [formControl]="getFormControlValue(formGroup)" />
-            }
-            @case('Button'){
-            <button type="button" class="form-control mb-1" [formControl]="getFormControlValue(formGroup)"> </button>
-            }
-            @default{
-            <input type="text" class="form-control mb-1" [formControl]="getFormControlValue(formGroup)" />
-            }
-            }
-          </div>
-          }
-        </form>
       </div>
     </div>
   </div>

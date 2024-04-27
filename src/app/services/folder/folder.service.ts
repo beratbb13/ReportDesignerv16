@@ -11,7 +11,6 @@ import { HttpClient } from '@angular/common/http';
 })
 export class FolderService {
   constructor(private el: ElementService, private authService: AuthService, private http: HttpClient) {
-    this.folders.next([this.selectedFolder.value]);
     this.elementService = el;
     this.elementService.setFolderService(this);
   }
@@ -22,86 +21,103 @@ export class FolderService {
   content: BehaviorSubject<any> = new BehaviorSubject<any>({});
   count: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   selectedFile: BehaviorSubject<file | null> = new BehaviorSubject<file | null>(null);
+  tempSelectedFile: BehaviorSubject<file | null> = new BehaviorSubject<file | null>(null);
   tempSelectedFolder: BehaviorSubject<folder | null> = new BehaviorSubject<folder | null>(null);
-  selectedFolder: BehaviorSubject<folder> = new BehaviorSubject<folder>({
+  selectedFolder: BehaviorSubject<folder | null> = new BehaviorSubject<folder | null>(null);
+  folders: BehaviorSubject<folder> = new BehaviorSubject<folder>({
     id: 0,
-    folderName: 'Deneme',
+    folderName: 'Main',
     files: [],
-    folders: [
-      {
-        id: 1,
-        folderName: 'Deneme_2',
-        files: [],
-        folders: [],
-        isOpen: true
-      },
-      {
-        id: 22,
-        folderName: 'Deneme_3',
-        files: [],
-        folders: [],
-        isOpen: true
-      }
-    ],
-    isOpen: true
+    folders: [],
   });
-  folders: BehaviorSubject<folder[]> = new BehaviorSubject<folder[]>([]);
   save: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  saveFile() {
-    this.save.next(true);
+  addFileByFolderId(folderId: number, fileName: string, username: string = 'beratbb13') {
+    const body = {
+      "Token": this.token,
+      "DataStoreId": Endpoints.formFilesDataStoreId,
+      "Operation": "read",
+      "Data": `insert into form_files (pid, name, cuser, isFile) values ('${folderId}', '${fileName}', '${username}', true) returning id, pid, name, cuser, content`,
+      "Encrypted": "1951",
+    }
+    return this.http.post(Endpoints.dataops, body).pipe(
+      map((response: any) => {
+        return response.message;
+      })
+    );
   }
 
-  addFolderByFolderId(folderId: number, newFolder: folder) {
-    let folders = this.folders.getValue();
-    let stat: boolean = true;
+  addFolderByFolderIdAndUsername(fileName: string, folderId: number, username: string) {
+    const body = {
+      "Token": this.token,
+      "DataStoreId": Endpoints.formFilesDataStoreId,
+      "Operation": "read",
+      "Data": `insert into form_files (pid, name, cuser, isFile) values ('${folderId}', '${fileName}', '${username}', false) returning id, pid, name, cuser`,
+      "Encrypted": "1951",
+    }
+    return this.http.post(Endpoints.dataops, body).pipe(
+      map((response: any) => {
+        return response.message;
+      })
+    );
+  }
 
-    folders.forEach(folder => {
-      if (folder.id === folderId) {
-        folder.folders.push(newFolder);
-        return;
-      } else {
-        if (folder.folders.length) {
-          folder.folders.forEach(subFolder => {
-            if (subFolder.id === folderId) {
-              subFolder.folders.push(newFolder);
-              return;
-            }
-          })
-        }
-      }
-    });
-    this.folders.next(folders);
-    return stat;
+  getFoldersByuserName(userName: string) {
+    const body = {
+      "Token": this.token,
+      "DataStoreId": Endpoints.formFilesDataStoreId,
+      "Operation": "read",
+      "Data": `select id, pid, name, cuser, isFile, content from form_files where cuser like '${userName}'`,
+      "Encrypted": "1951",
+    }
+    return this.http.post(Endpoints.dataops, body).pipe(
+      map((response: any) => {
+        return response;
+      })
+    );
+  }
+
+  getTemplateByFileId(fileId: number) {
+    const body = {
+      "Token": this.token,
+      "DataStoreId": Endpoints.formTemplatesDataStoreId,
+      "Operation": "read",
+      "Data": `select id, fileid, username, name, content from form_templates where fileid = ${fileId}`,
+      "Encrypted": "1951",
+    }
+    return this.http.post(Endpoints.dataops, body).pipe(
+      map((response: any) => {
+        return response;
+      })
+    );
   }
 
   getTemplateByuserName(userName: string) {
     const body = {
       "Token": this.token,
-      "DataStoreId": Endpoints.forumTemplatesDataStoreId,
+      "DataStoreId": Endpoints.formTemplatesDataStoreId,
       "Operation": "read",
-      "Data": `select * from form_templates where username like '${userName}'`,
+      "Data": `select id, fileid, username, name, content from form_templates where username like '${userName}'`,
       "Encrypted": "1951",
     }
     return this.http.post(Endpoints.dataops, body).pipe(
       map((response: any) => {
-        return response
+        return response;
       })
     );
   }
 
-  saveTemplate(file: file, username: string) {
-    console.log()
+  saveTemplate(file: any, username: string) {
     const body = {
       "Token": this.token,
-      "DataStoreId": Endpoints.forumTemplatesDataStoreId,
-      "Operation": "insert",
-      "Data": `insert into form_templates (username, name, content) values ('${username}', '${file.name}', '${file.content}')`,
+      "DataStoreId": Endpoints.formTemplatesDataStoreId,
+      "Operation": "upsert",
+      "Data": `update form_files set content = '${file.content}' where id = ${file.id} and cuser like '${username}'`,
       "Encrypted": "1951",
     }
     return this.http.post(Endpoints.dataops, body).pipe(
       map((response: any) => {
-        return response.message
+        return response.message;
       })
     );
   }

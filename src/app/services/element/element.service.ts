@@ -15,9 +15,9 @@ export class ElementService {
     this.folderService = service2;
   }
 
-  elements_: BehaviorSubject<htmlElements[]> = new BehaviorSubject<htmlElements[]>([]);
-  selectedElement: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   elements: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+  changedElements: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+  selectedElement: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   previewMode: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   generateUUID(): string {
@@ -29,7 +29,7 @@ export class ElementService {
   }
 
   addElement(element: any): void {
-    const currentElements = this.elements_.getValue();
+    const currentElements = this.changedElements.getValue();
     const uuid = this.generateUUID();
     element['id'] = uuid;
 
@@ -130,29 +130,23 @@ export class ElementService {
       }
 
     currentElements.push(element);
-    this.elements_.next(currentElements);
+    this.changedElements.next(currentElements);
   }
 
-  saveLayout() {
+  /*saveLayout() {
     let file!: file;
-    this.folderService.selectedFile.asObservable().subscribe(res => {
-      if (res !== null)
-        file = res;
-    })
-    this.elements.asObservable().subscribe((data) => {
-      if (file)
-        file.content = JSON.stringify(data);
-    });
+    let fileResponse = this.folderService.selectedFile.getValue();
+    let dataResponse = this.elements.getValue();
 
-    if (file)
+    if (fileResponse) {
+      file = fileResponse;
+      file.content = JSON.stringify(dataResponse);
       this.folderService.selectedFile.next(file);
-
+    }
     this.folderService.saveTemplate(file, 'beratbb13').subscribe(res => {
       console.log(res);
     })
-    console.dir(JSON.parse(file.content))
-
-  }
+  }*/
 
   setSelectedElement(elementRef: any) {
     let selected: any;
@@ -168,7 +162,7 @@ export class ElementService {
     let selected = this.selectedElement.getValue();
     let filteredElements = elements.filter(e => e.id !== selected.id);
 
-    this.elements.next(filteredElements);
+    this.changedElements.next(filteredElements);
     this.selectedElement.next(null);
   }
 }

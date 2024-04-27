@@ -14,7 +14,8 @@ import { ElementService } from '../../../services/element/element.service';
   schemas: [NO_ERRORS_SCHEMA]
 })
 export class PreviewComponent {
-  constructor(private elementService: ElementService, private fb: FormBuilder, private http: HttpService) { }
+  constructor(private elementService: ElementService, private fb: FormBuilder, private http: HttpService) {
+  }
 
   @ViewChild('content', { static: true }) content!: ElementRef;
   elements: any[] = [];
@@ -28,10 +29,12 @@ export class PreviewComponent {
       formArray: this.fb.array([])
     });
 
-    this.elementService.elements_.asObservable().subscribe(res => {
-      this.elements = res;
-      console.log(res);
-      this.createFormElements(res);
+    this.elementService.changedElements.asObservable().subscribe(res => {
+      if (this.elements !== res) {
+        console.log(res);
+        this.elements = res;
+        this.createFormElements(res);
+      }
     });
   }
 

@@ -100,10 +100,21 @@
         }
     </form>
     <br>
-
     <div class="form-group mb-1 d-flex justify-content-center" style="padding-bottom: 5px;"
         *ngIf="this.selectedElement.name === 'Selectbox'">
         <label>Items</label>
+    </div>
+    <div class="form-group mb-1" style="padding-bottom: 5px;" *ngIf="controlName === 'selectbox'">
+        <label style="width: 100%; font-size: 15px;">
+            Get Items From Endpoint</label>
+        <input type="text" class="form-control"
+            style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
+            [(ngModel)]="endPoint" [ngModelOptions]="{standalone: true}" />
+        <div class="d-flex justify-content-center mt-1">
+            <button class="btn btn-success" style="border-radius: 5px; 
+            background-color: white !important; color: black !important" (click)="getItems()">Get Items
+            </button>
+        </div>
     </div>
     <div class="form-group" *ngIf="this.selectedElement.name === 'Selectbox'">
         <form [formGroup]="propertyForm">

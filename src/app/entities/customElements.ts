@@ -99,15 +99,15 @@ export interface htmlTemplate {
 
 export interface folder {
     id: number,
+    pid?: number,
     folderName: string,
     files: file[],
     folders: folder[],
-    isOpen: boolean
 }
 
 export interface file {
     fileId: number,
     name: string,
-    content: string,
+    content: string | null,
     isSelected?: boolean;
 }

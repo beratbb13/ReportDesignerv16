@@ -1,4 +1,4 @@
-import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
+import { Component, NO_ERRORS_SCHEMA, ViewChild } from '@angular/core';
 import { CdkDragDrop, CdkDropList, CdkDragPreview, CdkDrag, transferArrayItem } from '@angular/cdk/drag-drop';
 import { FormsModule } from '@angular/forms';
 import { ElementService } from '../../../services/element/element.service';
@@ -6,6 +6,7 @@ import { FolderService } from '../../../services/folder/folder.service';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MainEditorComponent } from '../main-editor/main-editor.component';
 
 @Component({
   selector: 'app-element-toolbar',
@@ -25,6 +26,7 @@ export class ElementToolbarComponent {
     });
   }
 
+  @ViewChild(MainEditorComponent) mainEditorComponent!: MainEditorComponent;
   editorProperties: any = {};
   draggable: boolean = false;
   searchBar: string = '';

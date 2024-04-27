@@ -20,20 +20,21 @@ export class SubFileComponent {
   }
 
   @Input() folder!: folder;
-  @Input() paddingLeft: any;
+  @Input() paddingLeft: number = 0;
   @Input() toggle: boolean = false;
   @Input() showFiles: boolean = false;
   @Input() tempSelectedFolder: string | undefined = undefined;
 
-  public count: number = 1;
+  public count: number = 0;
 
   ngOnChanges() {
     this.count++
   }
 
   selected(file: file) {
+    //this.folderService.tempSelectedFile.next(file);
     this.folderService.selectedFile.next(file);
-    this.folderService.selectedFile.asObservable().subscribe((value) => { /*console.log(value) */ });
+    //this.folderService.selectedFile.asObservable().subscribe((value) => { /*console.log(value) */ });
     this.dialogService.isOpen.next(true);
   }
 
@@ -47,9 +48,9 @@ export class SubFileComponent {
     this.folderService.tempSelectedFolder.next(this.folder);
   }
 
-  selectFile(file: file) {
+  /*selectFile(file: file) {
     this.folderService.selectedFile.next(file);
     this.tempSelectedFolder = undefined;
-  }
+  }*/
 
 }

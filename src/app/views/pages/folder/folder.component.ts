@@ -22,7 +22,7 @@ export class FolderComponent {
   constructor(private folderService: FolderService) {
     this.folderService.folders.asObservable().pipe(
       tap(res => {
-        this.folders = res;
+        this.folders = [res];
       }),
     ).subscribe(() => { /*console.log(this.folders)*/ });
   }

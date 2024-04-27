@@ -1,7 +1,0 @@
-<label [style.fontSize.px]="options.fontSize" [style.color]="options.fontColor" [style.width.px]="style.width"
-    [style.height.px]="style.height" style="display: flex; align-items: center; justify-content: center;"
-    *ngIf="styleRelative === null">{{ options.text }}</label>
-
-<label [style.fontSize.px]="options.fontSize" [style.color]="options.fontColor" [style.width.%]="styleRelative.width"
-    [style.height.%]="styleRelative.height" style="display: flex; align-items: center; justify-content: center;"
-    *ngIf="styleRelative !== null">{{ options.text }}</label>

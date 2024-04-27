@@ -15,4 +15,8 @@ export class HttpService {
   postApi(endPoint: string, attributes: any) {
     return this.http.post(`http://localhost:3000/${endPoint}`, attributes);
   }
+
+  getSelectValues(endPoint: string) {
+    return this.http.get(endPoint);
+  }
 }

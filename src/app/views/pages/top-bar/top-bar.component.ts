@@ -8,6 +8,7 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { ElementService } from '../../../services/element/element.service';
+import { concatMap } from 'rxjs';
 
 @Component({
   selector: 'app-top-bar',
@@ -26,13 +27,16 @@ export class TopBarComponent {
 
   folders: folder[] = [];
   toggle: boolean = false;
-  selectedFolder: folder = { id: -1, folderName: '', files: [], folders: [], isOpen: false }
+  selectedFolder: folder = { id: -1, folderName: '', files: [], folders: [] }
   selectedFile: any = {};
   showFileCreator: boolean = false;
   newFileName: string = '';
 
   constructor(private folderService: FolderService, private dialogService: DialogService, private elementService: ElementService, private fb: FormBuilder) {
-    this.folderService.folders.asObservable().subscribe(res => this.folders = res);
+    this.folderService.folders.asObservable().subscribe(res => {
+      if (res != null)
+        this.folders = [res]
+    });
 
     this.dialogService.isOpen.asObservable().subscribe(res => {
       if (res == true) {
@@ -50,12 +54,11 @@ export class TopBarComponent {
       }
     });
 
-    this.folderService.selectedFile.asObservable().subscribe(res => {
+    /*this.folderService.selectedFile.asObservable().subscribe(res => {
       if (res) {
         this.selectedFile = res;
       }
-    });
-
+    });*/
   }
 
   isNew: boolean = false;
@@ -176,10 +179,11 @@ export class TopBarComponent {
       text: 'Add new folder',
       inActive: false
     }
+    this.enteredFolderName = '';
+    this.dialogService.isOpen.next(false);
   }
 
   expand(folder: folder) {
-    folder.isOpen = true;
     let folderElements = document.getElementsByClassName(folder.folderName);
 
     if (folderElements) {
@@ -193,10 +197,9 @@ export class TopBarComponent {
     }
   }
 
-  paddingLeftStart: number = 5;
+  paddingLeftStart: number = 2;
 
   collapse(folder: folder) {
-    folder.isOpen = false;
     let folderElements = document.getElementsByClassName(folder.folderName);
 
     if (folderElements) {
@@ -217,34 +220,12 @@ export class TopBarComponent {
   }
 
   crateNewFile() {
-    const newFile: file = {
-      fileId: 15,
-      name: this.newFileName,
-      content: `[]`,
-      isSelected: false
-    }
-
-    this.selectedFolder.files.push(newFile);
-    this.folderService.selectedFolder.next(this.selectedFolder);
-    this.folderService.selectedFile.next(newFile);
-    this.selectedFileId = newFile.fileId;
+    this.folderService.addFileByFolderId(this.selectedFolder.id, this.newFileName).subscribe(res => {
+      let addedFile = res[0];
+      this.selectedFolder.files.push(addedFile);
+      this.folderService.selectedFile.next(addedFile);
+    });
     this.closeModal();
-  }
-
-  printFilesInFolders(folder: any, indentation = 0) {
-    console.log(' '.repeat(indentation * 4) + folder.folderName);
-
-    if (folder.files) {
-      for (const file of folder.files) {
-        console.log(' '.repeat((indentation + 1) * 4) + file.name);
-      }
-    }
-
-    if (folder.folders) {
-      for (const subfolder of folder.folders) {
-        this.printFilesInFolders(subfolder, indentation + 1);
-      }
-    }
   }
 
   confirmSelection() {
@@ -264,7 +245,38 @@ export class TopBarComponent {
   }
 
   saveChanges() {
-    this.folderService.saveFile();
+    let elements = this.elementService.changedElements.getValue();
+    let file: file | null = this.folderService.selectedFile.getValue();
+    let stringify: string = ''
+    if (elements.length)
+      stringify = JSON.stringify(elements);
+    if (stringify.length > 10 && file !== null) {
+      file.content = stringify;
+      this.folderService.saveTemplate({ content: stringify, id: file.fileId }, 'beratbb13')
+        .subscribe(res => {
+          //if (res.result == true && res.message == 'Success') {
+          let mainFolder = this.folderService.folders.getValue();
+          if (file !== null) {
+            let foundedStat = this.updateFile(mainFolder, file);
+
+            if (foundedStat) {
+              if (this.foundedFolderIndex === 0) {
+                mainFolder.files[this.foundedFileIndex] = file;
+                this.folderService.folders.next(mainFolder);
+              } else {
+                mainFolder.folders[this.foundedFolderIndex].files[this.foundedFileIndex] = file;
+                this.folderService.folders.next(mainFolder);
+              }
+            } else if (!foundedStat) {
+              console.log('dosya bulunamadı');
+            }
+
+            this.foundedFolderIndex = -1;
+            this.foundedFileIndex = -1;
+          }
+          //}
+        });
+    }
   }
 
   showOnPreview() {
@@ -301,21 +313,56 @@ export class TopBarComponent {
       }
     } else if (this.buttonInnerHtml.id === 1 && this.buttonInnerHtml.inActive === false) {
       let folder = this.folderService.tempSelectedFolder.getValue();
+      if (folder !== null)
+        this.folderService.addFolderByFolderIdAndUsername(this.enteredFolderName, folder.id, 'beratbb13').pipe(
+          concatMap(file => {
+            return file;
+          })
+        ).subscribe((res: any) => {
+          if (res.id) {
+            let folders = this.folderService.folders.getValue();
+            this.findAndAddFolderOrFile(folders, res, false);
+            this.folderService.folders.next(folders);
+            this.closeModal();
+          }
+        });
+    }
+  }
 
-      if (folder !== null) {
-        const newFolder: folder = {
-          id: 88,
-          folderName: this.enteredFolderName,
-          files: [],
-          folders: [],
-          isOpen: true
-        }
-        let stat = this.folderService.addFolderByFolderId(folder.id, newFolder);
+  foundedFolderIndex: number = -1;
+  foundedFileIndex: number = -1;
 
-        if (stat) {
-          this.closeModal();
-        }
+  updateFile(folder: folder, file: file | null) {
+    if (file === null)
+      return null;
+    this.foundedFolderIndex += 1;
+    this.foundedFileIndex = -1;
+    for (let innerFile of folder.files) {
+      if (innerFile.fileId == file.fileId) {
+        this.foundedFileIndex += 1;
+        return true;
       }
     }
+    folder.folders.forEach(subFolder => {
+      this.updateFile(subFolder, file);
+    });
+    return false;
+  }
+
+  findAndAddFolderOrFile(folder: any, res: any, isFile: boolean) {
+    if (folder.id === res.pid) {
+      if (isFile) {
+        folder.files.push({ fileId: res.id, name: res.name, pid: res.pid, content: '' });
+      } else {
+        folder.folder.push({ id: res.id, folderName: res.name, pid: res.pid, folders: [], files: [] });
+      }
+      return true;
+    }
+    for (let subFolder of folder.folders) {
+      if (this.findAndAddFolderOrFile(subFolder, res, isFile)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

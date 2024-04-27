@@ -2,6 +2,11 @@ import { Component } from '@angular/core';
 import { ElementService } from '../../../services/element/element.service';
 import { AbstractControl, Form, FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { HttpService } from '../../../services/http/http.service';
+
+interface ApiResponse {
+  [key: string]: any;
+}
 
 @Component({
   selector: 'app-properties',
@@ -97,8 +102,22 @@ export class PropertiesComponent {
 
   controlName: string = '';
   form_Control: string = '';
+  endPoint: string = '';
 
-  constructor(private elementService: ElementService, private fb: FormBuilder) {
+  getItems() {
+    if (this.endPoint.length) {
+      console.log(this.endPoint);
+      this.http.getSelectValues(this.endPoint).subscribe((res: any) => {
+        if (res) {
+          res.names.forEach((name: string) => {
+            this.addItem(name);
+          })
+        }
+      });
+    }
+  }
+
+  constructor(private elementService: ElementService, private fb: FormBuilder, private http: HttpService) {
     this.propertyForm = this.fb.group({
       properties: this.fb.array([]),
       styles: this.fb.array([]),
@@ -106,9 +125,7 @@ export class PropertiesComponent {
     });
 
     this.elementService.selectedElement.asObservable().subscribe(res => {
-
       this.selectedElement = res;
-
       if (res !== null) {
         this.controlName = res.name.toLowerCase();
         if (res.formControlName) {
@@ -117,7 +134,6 @@ export class PropertiesComponent {
           this.form_Control = '';
         }
       }
-
 
       if (this.properties && this.properties.length)
         this.properties.clear();
@@ -155,10 +171,10 @@ export class PropertiesComponent {
     })
   }
 
-  addItem() {
+  addItem(itemVal: string = '') {
     const length = this.items.controls.length + 1;
     const group = this.fb.group({
-      [length]: this.fb.control('')
+      [length]: this.fb.control(itemVal)
     })
 
     this.items.push(group);
@@ -269,6 +285,7 @@ export class PropertiesComponent {
   }
 
   onSubmit() {
+    debugger
     if (this.selectedElement.name === 'Selectbox') {
       this.items.controls.forEach((control: any) => {
         const value = control.get(Object.keys(control.value)[0]).value;
@@ -286,15 +303,12 @@ export class PropertiesComponent {
     if (this.selectedElement !== null) {
 
       if (this.selectedElement.label != 'Combobox' && this.selectedElement.label != 'Listbox') {
-
         this.properties.controls.forEach((control) => {
           const groupValue = control.value;
-
           Object.keys(groupValue).forEach((key) => {
             resultObject[key] = groupValue[key];
           });
         });
-
         this.selectedElement['attributes'] = resultObject;
 
       } else {
@@ -363,11 +377,11 @@ export class PropertiesComponent {
 
       this.elementService.selectedElement.next(this.selectedElement);
       this.form_Control = '';
-      let elements = this.elementService.elements_.getValue();
+      let elements = this.elementService.elements.getValue();
       let index = elements.findIndex((element) => element.id == this.selectedElement.id);
 
       elements[index] = this.selectedElement;
-      this.elementService.elements_.next(elements);
+      this.elementService.elements.next(elements);
     }
 
     this.elementService.selectedElement.next(null);

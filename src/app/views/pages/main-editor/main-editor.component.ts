@@ -3,18 +3,6 @@ import { ElementService } from '../../../services/element/element.service';
 import { CdkDrag, CdkDragEnd } from '@angular/cdk/drag-drop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DOCUMENT } from '@angular/common';
-import { TextareaElementComponent } from '../../components/textarea-element/textarea-element.component';
-import { ButtonElementComponent } from '../../components/button-element/button-element.component';
-import { CheckboxElementComponent } from '../../components/checkbox-element/checkbox-element.component';
-import { ComboboxElementComponent } from '../../components/combobox-element/combobox-element.component';
-import { ImageElementComponent } from '../../components/image-element/image-element.component';
-import { LabelElementComponent } from '../../components/label-element/label-element.component';
-import { LinkElementComponent } from '../../components/link-element/link-element.component';
-import { ListboxElementComponent } from '../../components/listbox-element/listbox-element.component';
-import { OptionElementComponent } from '../../components/option-element/option-element.component';
-import { RadioElementComponent } from '../../components/radio-element/radio-element.component';
-import { TableElementComponent } from '../../components/table-element/table-element.component';
-import { TextboxElementComponent } from '../../components/textbox-element/textbox-element.component';
 import { FolderService } from '../../../services/folder/folder.service';
 
 export type ResizeDirectionType = 'x' | 'y' | 'xy' | 't' | 'l';
@@ -22,10 +10,7 @@ export type ResizeDirectionType = 'x' | 'y' | 'xy' | 't' | 'l';
 @Component({
   selector: 'app-main-editor',
   standalone: true,
-  imports: [CdkDrag, FormsModule, CommonModule, TextareaElementComponent, ButtonElementComponent,
-    CheckboxElementComponent, ComboboxElementComponent, ImageElementComponent, LabelElementComponent,
-    LinkElementComponent, ListboxElementComponent, OptionElementComponent, RadioElementComponent,
-    TableElementComponent, TextboxElementComponent, ReactiveFormsModule],
+  imports: [CdkDrag, FormsModule, CommonModule, ReactiveFormsModule],
   templateUrl: './main-editor.component.html',
   styleUrl: './main-editor.component.css'
 })
@@ -65,142 +50,102 @@ export class MainEditorComponent {
       x: this.content.nativeElement.offsetLeft, y: this.content.nativeElement.offsetTop,
       width: this.content.nativeElement.clientWidth, height: this.content.nativeElement.clientHeight
     });
+  }
 
-    this.folderService.save.asObservable().subscribe(res => {
-      if (res) {
-        let isPreviewMode = this.elementService.previewMode.getValue();
-
-        this.elements.forEach(element => {
-          let elementX = element.position.x;
-          let elementY = element.position.y;
-
-          let relativeX = ((elementX - this.contentXStart) / this.contentWidth) * 100;
-          let relativeY = ((elementY - this.contentYStart) / this.contentHeight) * 100;
-
-          element.positionRelative = {
-            x: relativeX,
-            y: relativeY
-          }
-
-          let elementStyleWidth = parseFloat(element.style.width);
-          let elementStyleHeight = parseFloat(element.style.height);
-
-          let widthRatio = (elementStyleWidth / this.contentWidth) * 100;
-          let heightRatio = (elementStyleHeight / this.contentHeight) * 100;
-
-          element.styleRelative = {
-            width: widthRatio,
-            height: heightRatio
-          }
-
-        });
-        this.elementService.selectedElement.next(null);
-        if (!isPreviewMode) {
-          this.elementService.elements.next(this.elements);
-          this.elementService.saveLayout();
-        }
-      }
-    });
-
+  ngOnInit() {
+    console.log('asdasd');
     this.folderService.selectedFile.asObservable().subscribe(res => {
-      if (res !== null) {
-        this.fileId = res.fileId;
-        if (JSON.parse(res.content).length) {
-          this.createForm(JSON.parse(res.content));
+      if (res) {
+        if (this.fileId !== res.fileId) {
+          this.fileId = res.fileId;
+          if (res?.content != null) {
+            this.elementService.changedElements.next(JSON.parse(res.content));
+          } else {
+            //this.mainEditorComponent.elements = [];
+            //this.elementService.elements.next([]);
+            this.elementService.changedElements.next([]);
+          }
         }
       }
     });
 
-    /*this.elementService.previewMode.asObservable().subscribe(isPreviewMode => {
-      if (!isPreviewMode) {
-        let res = this.elementService.elements_.getValue();
-        this.elements = res;
-        if (res.length)
-          this.createForm(res);
+    this.folderService.save.asObservable().subscribe(isSaved => {
+      if (isSaved) {
+        this.getBounds();
+
+        this.elementService.selectedElement.next(null);
+        this.folderService.save.next(false);
+        this.elementService.changedElements.next(this.elements);
+      }
+    });
+
+    /*this.folderService.tempSelectedFile.asObservable().subscribe(tempSelectedFile => {
+      if (tempSelectedFile !== null) {
+        this.fileId = tempSelectedFile.fileId;
+        if (tempSelectedFile.content !== null) {
+          if (JSON.parse(tempSelectedFile.content).length)
+            this.elementService.changedElements.next(JSON.parse(tempSelectedFile.content));
+          //this.createForm(JSON.parse(tempSelectedFile.content));
+        } else {
+          this.elementService.changedElements.next([]);
+        }
+        debugger
+        this.folderService.selectedFile.next(tempSelectedFile);
       }
     });*/
+
+    let isPreviewMode = this.elementService.previewMode.getValue();
+    if (isPreviewMode) {
+      this.getBounds();
+      this.elementService.changedElements.next(this.elements);
+      console.log(this.elementService.changedElements.getValue());
+    }
+
+    this.elementService.changedElements.asObservable().subscribe(changedElements => {
+      if (changedElements) {
+        this.createForm(changedElements);
+      }
+    });
+
+    /*this.elementService.elements.asObservable().subscribe(res => {
+      //if (res.length)
+      this.createForm(res);
+    });*/
+
+  }
+
+  getBounds() {
+    this.elements.forEach(element => {
+      let bounds = document.getElementById(element.id)?.getBoundingClientRect();
+      if (bounds) {
+        element.position = {
+          x: bounds.x,
+          y: bounds.y
+        }
+      }
+    });
   }
 
   removeElement(event: MouseEvent, element: any) {
     event.preventDefault();
     let filtered = this.elements.filter(el => el.id !== element.id);
-    this.elementService.elements_.next(filtered);
+    this.getBounds();
+    this.elementService.changedElements.next(filtered);
+
+    /*let selectedFile = this.folderService.selectedFile.getValue();
+    let elements = this.elementService.elements.getValue();
+    if (selectedFile) {
+      selectedFile.content = JSON.stringify(elements);
+    }
+    this.elements = elements;*/
+
     this.elementService.selectedElement.next(null);
   }
 
-  onFocus(element: any) {
+  onFocus(event: MouseEvent, element: any) {
+    event.preventDefault();
     this.elementService.selectedElement.next(element);
     this.selectedElementId = element.id;
-  }
-
-  onDragEnded(event: CdkDragEnd, elementRef: any): void {
-    /*const dW = elementRef.position.x + event.distance.x;
-    const dH = elementRef.position.y + event.distance.y;
-    let screenX, screenY;
-
-    if (event.event instanceof MouseEvent) {
-      screenX = event.event.screenX;
-      screenY = event.event.screenY;
-    }
-
-    if ((dW > this.contentXStart && dW < this.contentXEnd) &&
-      (dH > this.contentYStart && dH < this.contentYEnd)) {
-      elementRef.position = {
-        x: screenX,
-        y: screenY
-      };
-
-      let relativeX = ((elementRef.position.x - this.contentXStart) / this.contentWidth) * 100;
-      let relativeY = ((elementRef.position.y - this.contentYStart) / this.contentHeight) * 100;
-
-      elementRef.positionRelative = {
-        x: relativeX,
-        y: relativeY
-      }
-      console.log('screenX', screenX);
-      console.log('screenY', screenY);
-    }
-
-    let index = this.elements.findIndex(el => el.id === elementRef.id);
-    if (index !== -1) {
-      this.elements[index] = elementRef;
-    }
-    console.log(this.elements);
-    this.elementService.elements_.next(this.elements);
-    */
-
-    const dW = elementRef.position.x + event.distance.x;
-    const dH = elementRef.position.y + event.distance.y;
-
-    let screenX, screenY;
-
-    if (event.event instanceof MouseEvent) {
-      screenX = event.event.screenX;
-      screenY = event.event.screenY;
-    }
-
-    if ((dW > this.contentXStart && dW < this.contentXEnd) &&
-      (dH > this.contentYStart && dH < this.contentYEnd)) {
-      elementRef.position = {
-        x: screenX,
-        y: screenY
-      };
-
-      let relativeX = ((elementRef.position.x - this.contentXStart) / this.contentWidth) * 100;
-      let relativeY = ((elementRef.position.y - this.contentYStart) / this.contentHeight) * 100;
-
-      /*elementRef.positionRelative = {
-        x: relativeX,
-        y: relativeY
-      }*/
-    }
-
-    let index = this.elements.findIndex(el => el.id === elementRef.id);
-    if (index !== -1) {
-      this.elements[index] = elementRef;
-    }
-
-    this.elementService.elements_.next(this.elements);
   }
 
   startResize(
@@ -256,19 +201,7 @@ export class MainEditorComponent {
   contentJSON: string = 'Choose a file';
 
   createForm(parsedJson: any[]) {
-    if (parsedJson.length) {
-      parsedJson.forEach((element: any) => {
-        if (element.positionRelative && element.styleRelative) {
-          element.position = {
-            x: Math.round(((element.positionRelative.x * (this.contentXEnd - this.contentXStart)) / 100) + this.contentXStart),
-            y: Math.round(((element.positionRelative.y * (this.contentYEnd - this.contentYStart)) / 100) + this.contentYStart)
-          }
-          element.style.width = Math.round((this.contentWidth * element.styleRelative.width) / 100);
-          element.style.height = Math.round((this.contentHeight * element.styleRelative.height) / 100);
-        }
-      });
-    }
-    this.elementService.elements_.next(parsedJson);
-    //this.elementService.previewMode.next(true);
+    this.elementService.elements.next(parsedJson);
+    this.elements = parsedJson;
   }
 }
