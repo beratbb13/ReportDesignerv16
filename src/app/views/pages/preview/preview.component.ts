@@ -31,7 +31,7 @@ export class PreviewComponent {
 
     this.elementService.changedElements.asObservable().subscribe(res => {
       if (this.elements !== res) {
-        console.log(res);
+        res.forEach(r => console.log(r.position));
         this.elements = res;
         this.createFormElements(res);
       }

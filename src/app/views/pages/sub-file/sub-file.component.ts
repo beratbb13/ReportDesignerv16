@@ -34,6 +34,7 @@ export class SubFileComponent {
   selected(file: file) {
     //this.folderService.tempSelectedFile.next(file);
     this.folderService.selectedFile.next(file);
+    this.folderService.selectedFileId.next(file.fileId);
     //this.folderService.selectedFile.asObservable().subscribe((value) => { /*console.log(value) */ });
     this.dialogService.isOpen.next(true);
   }

@@ -21,6 +21,7 @@ export class FolderService {
   content: BehaviorSubject<any> = new BehaviorSubject<any>({});
   count: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   selectedFile: BehaviorSubject<file | null> = new BehaviorSubject<file | null>(null);
+  selectedFileId: BehaviorSubject<number | null> = new BehaviorSubject<number | null>(null);
   tempSelectedFile: BehaviorSubject<file | null> = new BehaviorSubject<file | null>(null);
   tempSelectedFolder: BehaviorSubject<folder | null> = new BehaviorSubject<folder | null>(null);
   selectedFolder: BehaviorSubject<folder | null> = new BehaviorSubject<folder | null>(null);

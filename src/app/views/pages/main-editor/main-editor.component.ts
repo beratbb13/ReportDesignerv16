@@ -53,10 +53,12 @@ export class MainEditorComponent {
   }
 
   ngOnInit() {
-    console.log('asdasd');
     this.folderService.selectedFile.asObservable().subscribe(res => {
       if (res) {
-        if (this.fileId !== res.fileId) {
+        let selectedId = this.folderService.selectedFileId.getValue();
+        this.fileId = res.fileId;
+        if (selectedId !== res.fileId) {
+          console.log('mainEditor');
           this.fileId = res.fileId;
           if (res?.content != null) {
             this.elementService.changedElements.next(JSON.parse(res.content));

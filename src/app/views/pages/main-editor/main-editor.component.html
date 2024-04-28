@@ -5,7 +5,7 @@
     align-items: center;
     overflow: auto;
     width: 100%;
-    height: 90vh;
+    height: 92vh;
   ">
   <div class="example-boundary" *ngIf="fileId !== 0" #boundaryRef>
     @for(elementRef of elements; track elementRef){
@@ -20,7 +20,6 @@
         style="display: flex; justify-content: center; align-items: center; overflow: hidden;  background-color: transparent !important;"
         [style.width.px]="elementRef.style.width" [style.height.px]="elementRef.style.height"
         (contextmenu)="removeElement($event, elementRef)">
-
 
         <label *ngIf="elementRef.tag === 'label'" style="align-content: center;" [id]="elementRef.id"
           [style.width.px]=" elementRef.style.width" [style.height.px]="elementRef.style.height"
@@ -53,7 +52,6 @@
           [style.border]="elementRef.style.border" [decoding]="elementRef.attributes.decoding"
           [draggable]="elementRef.attributes.draggable" (dblclick)="isDragDisabled = !isDragDisabled"
           (click)="onFocus($event, elementRef)">
-
 
         <select *ngIf="elementRef.tag === 'select'" [id]="elementRef.id" [style.width.px]="elementRef.style.width"
           [style.height.px]="elementRef.style.height" [style.fontSize.px]="elementRef.style.fontSize"

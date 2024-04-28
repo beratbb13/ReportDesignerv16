@@ -224,6 +224,7 @@ export class TopBarComponent {
       let addedFile = res[0];
       this.selectedFolder.files.push(addedFile);
       this.folderService.selectedFile.next(addedFile);
+      this.folderService.selectedFileId.next(addedFile.id);
     });
     this.closeModal();
   }
@@ -247,18 +248,19 @@ export class TopBarComponent {
   saveChanges() {
     let elements = this.elementService.changedElements.getValue();
     let file: file | null = this.folderService.selectedFile.getValue();
+    let fileId = this.folderService.selectedFileId.getValue();
     let stringify: string = ''
     if (elements.length)
       stringify = JSON.stringify(elements);
     if (stringify.length > 10 && file !== null) {
       file.content = stringify;
-      this.folderService.saveTemplate({ content: stringify, id: file.fileId }, 'beratbb13')
+      this.folderService.saveTemplate({ content: stringify, id: fileId }, 'beratbb13')
         .subscribe(res => {
           //if (res.result == true && res.message == 'Success') {
-          let mainFolder = this.folderService.folders.getValue();
+          /*let mainFolder = this.folderService.folders.getValue();
           if (file !== null) {
             let foundedStat = this.updateFile(mainFolder, file);
-
+            debugger
             if (foundedStat) {
               if (this.foundedFolderIndex === 0) {
                 mainFolder.files[this.foundedFileIndex] = file;
@@ -273,11 +275,59 @@ export class TopBarComponent {
 
             this.foundedFolderIndex = -1;
             this.foundedFileIndex = -1;
-          }
+          }*/
+
+          //üstteki kısmı calısır duruma getir
+
+          this.folderService.getFoldersByuserName('beratbb13').subscribe(res => {
+            if (res.result == true && res.message) {
+              let response = res.message;
+
+              const tree = this.buildTree(response);
+              this.folderService.folders.next(tree);
+            }
+          })
           //}
         });
     }
   }
+
+
+
+  buildTree(files: any[]) {
+    const rootFolders: any[] = [];
+    const foldersMap = new Map<number, any>();
+
+    // Klasörleri oluştur
+    files.filter(file => file.isfile === 0).forEach(folder => {
+      const newFolder = { id: folder.id, pid: folder.pid, folderName: folder.name, files: [], folders: [] };
+      foldersMap.set(folder.id, newFolder);
+      if (folder.pid === null) {
+        rootFolders.push(newFolder);
+      }
+    });
+
+    // Dosyaları klasörlere ekle
+    files.filter(file => file.isfile === 1).forEach(file => {
+      const parentFolder = foldersMap.get(file.pid);
+      if (parentFolder) {
+        parentFolder.files.push({ fileId: file.id, pid: file.pid, name: file.name, content: file.content });
+      }
+    });
+
+    // Klasörleri alt klasör olarak ekle
+    foldersMap.forEach(folder => {
+      const parentFolder = foldersMap.get(folder.pid);
+      if (parentFolder) {
+        parentFolder.folders.push(folder);
+      }
+    });
+
+    return rootFolders[0];
+  }
+
+
+
 
   showOnPreview() {
     this.folderService.save.next(true);
@@ -338,15 +388,15 @@ export class TopBarComponent {
     this.foundedFolderIndex += 1;
     this.foundedFileIndex = -1;
     for (let innerFile of folder.files) {
-      if (innerFile.fileId == file.fileId) {
-        this.foundedFileIndex += 1;
+      this.foundedFileIndex += 1;
+      if (innerFile.fileId === file.fileId) {
         return true;
       }
     }
     folder.folders.forEach(subFolder => {
       this.updateFile(subFolder, file);
     });
-    return false;
+    return true;
   }
 
   findAndAddFolderOrFile(folder: any, res: any, isFile: boolean) {

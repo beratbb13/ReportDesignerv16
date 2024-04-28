@@ -1,8 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ElementService } from '../../../services/element/element.service';
 import { AbstractControl, Form, FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpService } from '../../../services/http/http.service';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 interface ApiResponse {
   [key: string]: any;
@@ -11,7 +14,7 @@ interface ApiResponse {
 @Component({
   selector: 'app-properties',
   standalone: true,
-  imports: [FormsModule, CommonModule, ReactiveFormsModule],
+  imports: [FormsModule, CommonModule, ReactiveFormsModule, MatSelectModule, MatFormFieldModule, MatInputModule],
   templateUrl: './properties.component.html',
   styleUrl: './properties.component.css'
 })
@@ -24,7 +27,7 @@ export class PropertiesComponent {
   attributeTypes = {
     id: 'text',
     name: 'text',
-    type: 'text',
+    type: 'select',
     value: 'text',
     disabled: 'boolean',
     readonly: 'boolean',
@@ -65,10 +68,10 @@ export class PropertiesComponent {
     fontSize: 'number',
     color: 'color',
     backgroundColor: 'color',
-    fontWeight: 'text',
-    fontStyle: 'text',
-    textDecoration: 'text',
-    textAlign: 'text',
+    fontWeight: 'select',
+    fontStyle: 'select',
+    textDecoration: 'select',
+    textAlign: 'select',
     lineHeight: 'text',
     letterSpacing: 'text',
     fontFamily: 'text',
@@ -97,7 +100,9 @@ export class PropertiesComponent {
     formnovalidate: 'boolean',
     formtarget: 'text',
     endPoint: 'text',
-    method: 'text'
+    method: 'text',
+    loading: 'select',
+    decoding: 'select'
   };
 
   controlName: string = '';
@@ -186,25 +191,27 @@ export class PropertiesComponent {
 
   createFormObjects(elementRef: any) {
     let entries = Object.entries(elementRef);
+    let name = this.selectedElement.name;
 
-    if (!(this.selectedElement.label == 'Combobox' || this.selectedElement.label == "Listbox"))
-      entries.forEach(([k, v]) => {
+    entries.forEach(([k, v]) => {
+      if (v instanceof Object) {
+        this.createFormObjects(v);
+      } else {
+        /*if ((name == 'Checkbox' || name == 'Radio')) {
+          if (k != 'type') {
+            const group = this.fb.group({
+              [k]: [v]
+            });
+            this.properties.push(group);
+          }
+        } else {*/
         const group = this.fb.group({
           [k]: [v]
         });
         this.properties.push(group);
-      })
-    else
-      entries.forEach(([k, v]) => {
-        if (v instanceof Object) {
-          this.createFormObjects(v);
-        } else {
-          const group = this.fb.group({
-            [k]: [v]
-          });
-          this.properties.push(group);
-        }
-      });
+        //}
+      }
+    });
   }
 
   createStyleObjects(elementRef: any) {
@@ -393,5 +400,21 @@ export class PropertiesComponent {
 
   getFormControlValue(formGroup: AbstractControl): FormControl {
     return formGroup.get(Object.keys(formGroup.value)[0]) as FormControl;
+  }
+
+  @ViewChild('panel') panel!: ElementRef;
+  isOpened: boolean = false;
+
+  onToggle() {
+    if (this.panel) {
+      if (this.isOpened) {
+        this.panel.nativeElement.style.display = 'none';
+        this.isOpened = false;
+      } else {
+        this.panel.nativeElement.style.display = 'block';
+        this.isOpened = true;
+      }
+    }
+    console.log(this.panel.nativeElement.style.display);
   }
 }

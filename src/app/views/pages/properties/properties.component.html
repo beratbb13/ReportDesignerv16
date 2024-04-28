@@ -32,22 +32,56 @@
                 style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
                 (change)="onFileSelected($event, formGroup)" />
             }@case ('select'){
-            <select class="form-select"
+
+            <mat-select disableRipple [formControl]="getFormControlValue(formGroup)"
                 style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
-                [formControl]="getFormControlValue(formGroup)">
+                *ngIf="getFormControlKey(formGroup) == 'type'">
+                <mat-option value="text">Text</mat-option>
+                <mat-option value="number">Number</mat-option>
+                <mat-option value="date">Date</mat-option>
+                <mat-option value="range">Range</mat-option>
+            </mat-select>
+
+            <!--<select class="form-select"
+                style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
+                [formControl]="getFormControlValue(formGroup)" *ngIf="getFormControlKey(formGroup) == 'type'">
                 <option value="text">text</option>
                 <option value="number">number</option>
                 <option value="date">date</option>
                 <option value="range">range</option>
-            </select>
+            </select>-->
+
+            <mat-select disableRipple [formControl]="getFormControlValue(formGroup)"
+                style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
+                *ngIf="getFormControlKey(formGroup) == 'loading'">
+                <mat-option value="auto">Auto</mat-option>
+                <mat-option value="eager">Eager</mat-option>
+                <mat-option value="lazy">Lazy</mat-option>
+            </mat-select>
+
+            <mat-select disableRipple [formControl]="getFormControlValue(formGroup)"
+                style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
+                *ngIf="getFormControlKey(formGroup) == 'decoding'">
+                <mat-option value="async">Async</mat-option>
+                <mat-option value="sync">sync</mat-option>
+                <mat-option value="auto">Auto</mat-option>
+            </mat-select>
+
             }
             @case ('boolean'){
-            <select class="form-select"
+            <mat-select disableRipple
+                style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
+                [formControl]="getFormControlValue(formGroup)">
+                <mat-option value="true">True</mat-option>
+                <mat-option value="false">False</mat-option>
+            </mat-select>
+
+            <!--<select class="form-select"
                 style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
                 [formControl]="getFormControlValue(formGroup)">
                 <option value="true">true</option>
                 <option value="false">false</option>
-            </select>
+            </select>-->
             }
             @default {
             <input type="text" class="form-control"
@@ -82,13 +116,96 @@
                 style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
                 (change)="onFileSelected($event, formGroup)" />
             }
+            @case ('select'){
+
+            <mat-select disableRipple
+                style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
+                [formControl]="getFormControlValue(formGroup)" *ngIf="getFormControlKey(formGroup) == 'fontWeight'">
+                <mat-option value="normal">Normal</mat-option>
+                <mat-option value="bold">Bold</mat-option>
+                <mat-option value="bolder">Bolder</mat-option>
+                <mat-option value="lighter">Lighter</mat-option>
+            </mat-select>
+
+            <!--<select class="form-select"
+                style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
+                [formControl]="getFormControlValue(formGroup)" *ngIf="getFormControlKey(formGroup) == 'fontWeight'">
+                <option value="normal">Normal</option>
+                <option value="bold">Bold</option>
+                <option value="bolder">Bolder</option>
+                <option value="lighter">Lighter</option>
+            </select>-->
+
+            <mat-select disableRipple
+                style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
+                [formControl]="getFormControlValue(formGroup)" *ngIf="getFormControlKey(formGroup) == 'fontStyle'">
+                <mat-option value="normal">Normal</mat-option>
+                <mat-option value="italic">Italic</mat-option>
+                <mat-option value="oblique">Oblique</mat-option>
+                <mat-option value="initial">Initial</mat-option>
+                <mat-option value="inherit">Inherit</mat-option>
+            </mat-select>
+
+            <!--<select class="form-select"
+                style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
+                [formControl]="getFormControlValue(formGroup)" *ngIf="getFormControlKey(formGroup) == 'fontStyle'">
+                <option value="normal">Normal</option>
+                <option value="italic">Italic</option>
+                <option value="oblique">Oblique</option>
+                <option value="initial">Initial</option>
+                <option value="inherit">Inherit</option>
+            </select>-->
+
+            <mat-select disableRipple
+                style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
+                [formControl]="getFormControlValue(formGroup)" *ngIf="getFormControlKey(formGroup) == 'textDecoration'">
+                <mat-option value="none">None</mat-option>
+                <mat-option value="underline">Underline</mat-option>
+                <mat-option value="overline">Overline</mat-option>
+                <mat-option value="line-through">Line Through</mat-option>
+                <mat-option value="underline overline">Underline Overline</mat-option>
+                <mat-option value="underline line-through">Underline Line Through</mat-option>
+                <mat-option value="overline line-through">Overline Line Through</mat-option>
+                <mat-option value="underline overline line-through">Underline Overline Line Through</mat-option>
+            </mat-select>
+
+            <!--<select class="form-select"
+                style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
+                [formControl]="getFormControlValue(formGroup)" *ngIf="getFormControlKey(formGroup) == 'textDecoration'">
+                <option value="none">None</option>
+                <option value="underline">Underline</option>
+                <option value="overline">Overline</option>
+                <option value="line-through">Line Through</option>
+                <option value="underline overline">Underline Overline</option>
+                <option value="underline line-through">Underline Line Through</option>
+                <option value="overline line-through">Overline Line Through</option>
+                <option value="underline overline line-through">Underline Overline Line Through</option>
+            </select>-->
+
+            <mat-select disableRipple
+                style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
+                [formControl]="getFormControlValue(formGroup)" *ngIf="getFormControlKey(formGroup) == 'textAlign'">
+                <mat-option value="left">Left</mat-option>
+                <mat-option value="center">Center</mat-option>
+                <mat-option value="right">Right</mat-option>
+                <mat-option value="justify">Justify</mat-option>
+            </mat-select>
+
+            }
             @case ('boolean'){
-            <select class="form-select"
+            <mat-select disableRipple
+                style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
+                [formControl]="getFormControlValue(formGroup)">
+                <mat-option value="true">True</mat-option>
+                <mat-option value="false">False</mat-option>
+            </mat-select>
+
+            <!--<select class="form-select"
                 style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
                 [formControl]="getFormControlValue(formGroup)">
                 <option value="true">true</option>
                 <option value="false">false</option>
-            </select>
+            </select>-->
             }
             @default {
             <input type="text" class="form-control"
@@ -102,18 +219,23 @@
     <br>
     <div class="form-group mb-1 d-flex justify-content-center" style="padding-bottom: 5px;"
         *ngIf="this.selectedElement.name === 'Selectbox'">
-        <label>Items</label>
+        <div style="width: 80%; border-bottom: 2px solid #000000; text-align: center;">Items</div>
     </div>
     <div class="form-group mb-1" style="padding-bottom: 5px;" *ngIf="controlName === 'selectbox'">
-        <label style="width: 100%; font-size: 15px;">
-            Get Items From Endpoint</label>
-        <input type="text" class="form-control"
-            style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
-            [(ngModel)]="endPoint" [ngModelOptions]="{standalone: true}" />
-        <div class="d-flex justify-content-center mt-1">
-            <button class="btn btn-success" style="border-radius: 5px; 
-            background-color: white !important; color: black !important" (click)="getItems()">Get Items
-            </button>
+        <label
+            style="width: 100%; font-size: 15px; padding: 5px; cursor: pointer; margin-bottom: 5px; display: flex; justify-content: space-between;"
+            (click)="onToggle()">
+            Get Items From Endpoint <span><i class="fa-solid fa-caret-up" *ngIf="isOpened"></i><i
+                    class="fa-solid fa-caret-down" *ngIf="!isOpened"></i></span></label>
+        <div id="panel" #panel style="display: none;">
+            <input type="text" class="form-control"
+                style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
+                [(ngModel)]="endPoint" [ngModelOptions]="{standalone: true}" />
+            <div class="d-flex justify-content-center mt-1">
+                <span style="border-radius: 0px; cursor: pointer; font-size: 15px;
+            border-bottom: 2px solid blue; color: black !important" (click)="getItems()">Get Items
+                </span>
+            </div>
         </div>
     </div>
     <div class="form-group" *ngIf="this.selectedElement.name === 'Selectbox'">
@@ -128,22 +250,23 @@
                         [formControl]="getFormControlValue(formGroup)" />
                     &nbsp;&nbsp;
                     <button class="btn btn-danger" style="border-radius: 20px; 
-              background-color: white !important; color: black !important" (click)="removeItem(formGroup)">Del
+              background-color: white !important; color: black !important; font-size: 12px;"
+                        (click)="removeItem(formGroup)">Remove
                     </button>
                 </div>
             </div>
             }
             <br>
             <div class="mb-3 d-flex justify-content-end" style="padding-bottom: 5px;">
-                <span style="border-radius: 5px; cursor: pointer; font-size: 15px;
+                <span style="border-radius: 0px; cursor: pointer; font-size: 15px;
              border-bottom: 2px solid blue; color: black !important" (click)="addItem()">Add Item</span>
             </div>
         </form>
     </div>
 
     <div class="form-group d-flex justify-content-center align-items-center mb-2">
-        <span style="border-radius: 5px; cursor: pointer; font-size: 15px;
-             border-bottom: 2px solid blue; color: black !important" (click)="onSubmit()"
+        <span style="border-radius: 3px; cursor: pointer; font-size: 15px; padding: 3px 5px;
+             border: 2px solid blue; color: black !important" (click)="onSubmit()"
             *ngIf="properties.controls.length > 0">Save Changes</span>
     </div>
 </div>
