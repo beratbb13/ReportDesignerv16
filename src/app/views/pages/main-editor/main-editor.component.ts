@@ -1,9 +1,10 @@
-import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, Inject, Input, ViewChild } from '@angular/core';
 import { ElementService } from '../../../services/element/element.service';
 import { CdkDrag, CdkDragEnd } from '@angular/cdk/drag-drop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { FolderService } from '../../../services/folder/folder.service';
+import mainEditorCSS from './main-editor.component.css'
 
 export type ResizeDirectionType = 'x' | 'y' | 'xy' | 't' | 'l';
 
@@ -16,6 +17,12 @@ export type ResizeDirectionType = 'x' | 'y' | 'xy' | 't' | 'l';
 })
 export class MainEditorComponent {
 
+
+  returnHelloWorldCss() {
+    console.log('returnHelloWorldCss')
+    return this.content.nativeElement.innerHTML;
+  }
+
   @ViewChild('boundaryRef') boundaryElement!: ElementRef;
   @ViewChild('content') content!: ElementRef;
   @ViewChild('resizeCorner') resizeCornerRef!: ElementRef;
@@ -23,7 +30,7 @@ export class MainEditorComponent {
   minSize: { w: number; h: number } = { w: 100, h: 25 };
   elements: any[] = [];
   selectedElementId!: number;
-  fileId: number = 0;
+  @Input() fileId: number = 0;
   isDragDisabled: boolean = false;
   contentHeight: number = 0;
   contentWidth: number = 0;
@@ -52,24 +59,47 @@ export class MainEditorComponent {
     });
   }
 
+  @HostListener('window:resize', ['$event'])
+  onContentResize() {
+    let contentWidth = this.content.nativeElement.clientWidth;
+    let contentHeight = this.content.nativeElement.clientHeight;
+    let contentX = this.content.nativeElement.offsetLeft;
+    let contentY = this.content.nativeElement.offsetTop;
+
+    this.elements.forEach(element => {
+      let changedWidth = (element.styleRelative.width) * contentWidth;
+      let changedHeight = (element.styleRelative.height) * contentHeight;
+
+      element.style.width = changedWidth;
+      element.style.height = changedHeight;
+
+      let changedX = contentX * element.positionRelative.x//contentX + ((element.positionRelative.x) * contentX / 100);
+      let changedY = contentY * element.positionRelative.y//contentY + ((element.positionRelative.y) * contentY / 100);
+
+      element.position = {
+        x: changedX,
+        y: changedY
+      };
+    });
+
+    this.elementService.changedElements.next(this.elements);
+  }
+
   ngOnInit() {
-    this.folderService.selectedFile.asObservable().subscribe(res => {
-      if (res) {
-        let selectedId = this.folderService.selectedFileId.getValue();
+    let res = this.folderService.selectedFile.getValue();//.subscribe(res => {
+    if (res) {
+      let selectedId = this.folderService.selectedFileId.getValue();
+      this.fileId = res.fileId;
+      if (selectedId !== res.fileId) {
         this.fileId = res.fileId;
-        if (selectedId !== res.fileId) {
-          console.log('mainEditor');
-          this.fileId = res.fileId;
-          if (res?.content != null) {
-            this.elementService.changedElements.next(JSON.parse(res.content));
-          } else {
-            //this.mainEditorComponent.elements = [];
-            //this.elementService.elements.next([]);
-            this.elementService.changedElements.next([]);
-          }
+        if (res?.content != null) {
+          this.elementService.changedElements.next(JSON.parse(res.content));
+        } else {
+          this.elementService.changedElements.next([]);
         }
       }
-    });
+    }
+    //});
 
     this.folderService.save.asObservable().subscribe(isSaved => {
       if (isSaved) {
@@ -96,12 +126,20 @@ export class MainEditorComponent {
       }
     });*/
 
+    /* 
+     
+    28 nisan 17.00
+     
     let isPreviewMode = this.elementService.previewMode.getValue();
-    if (isPreviewMode) {
-      this.getBounds();
-      this.elementService.changedElements.next(this.elements);
-      console.log(this.elementService.changedElements.getValue());
-    }
+     if (isPreviewMode) {
+       this.getBounds();
+       this.elementService.changedElements.next(this.elements);
+       console.log(this.elementService.changedElements.getValue());
+     }
+     
+     
+     
+     */
 
     this.elementService.changedElements.asObservable().subscribe(changedElements => {
       if (changedElements) {

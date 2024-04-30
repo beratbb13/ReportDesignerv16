@@ -122,4 +122,19 @@ export class FolderService {
       })
     );
   }
+
+  updateApplicationId(applicationId: string, fileId: number) {
+    const body = {
+      "Token": this.token,
+      "DataStoreId": Endpoints.formTemplatesDataStoreId,
+      "Operation": "upsert",
+      "Data": `update form_files set applicationid = '${applicationId}' where id = ${fileId}`,
+      "Encrypted": "1951",
+    }
+    return this.http.post(Endpoints.dataops, body).pipe(
+      map((response: any) => {
+        return response;
+      })
+    );
+  }
 }

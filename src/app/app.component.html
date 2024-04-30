@@ -17,7 +17,7 @@
       </div>
     </div>
   </div>
-  <div class="row d-flex justify-content-center" *ngIf="previewMode === true">
+  <div class="row d-flex justify-content-center mb-3" *ngIf="previewMode === true">
     <div class="col-8">
       <nav class="navbar navbar-light bg-light p-2" style="background-color:rgba(187, 120, 36, 0.1) !important;">
         <button mat-button (click)="goBackEdit()">Back to Edit</button>
@@ -25,7 +25,7 @@
     </div>
   </div>
   <div class="row d-flex justify-content-center" *ngIf="previewMode === true">
-    <div class="col-8">
+    <div class="col-8 justify-content-center">
       <app-preview></app-preview>
     </div>
   </div>

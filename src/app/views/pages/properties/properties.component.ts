@@ -109,17 +109,9 @@ export class PropertiesComponent {
   form_Control: string = '';
   endPoint: string = '';
 
-  getItems() {
-    if (this.endPoint.length) {
-      console.log(this.endPoint);
-      this.http.getSelectValues(this.endPoint).subscribe((res: any) => {
-        if (res) {
-          res.names.forEach((name: string) => {
-            this.addItem(name);
-          })
-        }
-      });
-    }
+  ngOnInit() {
+    if (window.location.href)
+      this.endPoint = window.location.href;
   }
 
   constructor(private elementService: ElementService, private fb: FormBuilder, private http: HttpService) {
@@ -165,6 +157,18 @@ export class PropertiesComponent {
 
   get items(): FormArray {
     return this.propertyForm.get('items') as FormArray;
+  }
+
+  getItems() {
+    if (this.endPoint.length) {
+      this.http.getSelectValues(this.endPoint).subscribe((res: any) => {
+        if (res) {
+          res.names.forEach((name: string) => {
+            this.addItem(name);
+          })
+        }
+      });
+    }
   }
 
   createItemObjects(options: any[]) {
@@ -415,6 +419,5 @@ export class PropertiesComponent {
         this.isOpened = true;
       }
     }
-    console.log(this.panel.nativeElement.style.display);
   }
 }

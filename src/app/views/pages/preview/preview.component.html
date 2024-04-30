@@ -1,11 +1,6 @@
-<div #content id="content" style="
-   
-    height: 85vh;
-    position: absolute;
-    bottom: 0px;
-  ">
+<div>
     <form (submit)="formSubmit()">
-        <div class="example-boundary" *ngIf="elements.length" #boundaryRef>
+        <div class="example-boundary" *ngIf="elements.length">
             @for(elementRef of elements; track elementRef){
             <div #wrapper class="frame-wrapper example-box"
                 style="position: absolute; background-color: transparent !important;" [ngStyle]="{

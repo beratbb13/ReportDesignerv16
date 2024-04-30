@@ -14,8 +14,7 @@ import { ElementService } from '../../../services/element/element.service';
   schemas: [NO_ERRORS_SCHEMA]
 })
 export class PreviewComponent {
-  constructor(private elementService: ElementService, private fb: FormBuilder, private http: HttpService) {
-  }
+  constructor(private elementService: ElementService, private fb: FormBuilder, private http: HttpService) { }
 
   @ViewChild('content', { static: true }) content!: ElementRef;
   elements: any[] = [];
@@ -31,7 +30,6 @@ export class PreviewComponent {
 
     this.elementService.changedElements.asObservable().subscribe(res => {
       if (this.elements !== res) {
-        res.forEach(r => console.log(r.position));
         this.elements = res;
         this.createFormElements(res);
       }
@@ -64,7 +62,7 @@ export class PreviewComponent {
         });
       }
       this.formArray.push(group);
-    })
+    });
   }
 
   getFormGroup(id: string) {

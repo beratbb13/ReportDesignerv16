@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, HostListener, ViewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ElementToolbarComponent } from './views/pages/element-toolbar/element-toolbar.component';
 import { TopBarComponent } from './views/pages/top-bar/top-bar.component';
@@ -11,6 +11,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { FolderService } from './services/folder/folder.service';
+import helloWorldCss from './views/pages/main-editor/main-editor.component.css'
+
 
 @Component({
   selector: 'app-root',
@@ -21,12 +23,28 @@ import { FolderService } from './services/folder/folder.service';
 })
 export class AppComponent {
 
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    let result = this.mainEditorComponent.returnHelloWorldCss();
+    console.log(result);
+  }
+
   previewMode: boolean = false;
 
   @ViewChild(MainEditorComponent) mainEditorComponent!: MainEditorComponent;
+  @ViewChild(TopBarComponent) topBarComponent!: TopBarComponent;
   constructor(private elementService: ElementService, private folderService: FolderService) {
     this.elementService.previewMode.asObservable().subscribe(res => {
       this.previewMode = res;
+      if (res) {
+        let file = this.folderService.selectedFile.getValue();
+        if (file) {
+          let elements = this.elementService.changedElements.getValue();
+          file.content = JSON.stringify(elements);
+          this.folderService.selectedFile.next(file);
+        }
+      }
     });
   }
 
@@ -34,7 +52,46 @@ export class AppComponent {
     this.getSavedTemplate();
     this.getFolders();
     this.getSelectedFile();
+
+    this.folderService.selectedFile.asObservable().subscribe(res => {
+      if (res) {
+        let selectedId = this.folderService.selectedFileId.getValue();
+        this.mainEditorComponent.fileId = res.fileId;
+        if (selectedId !== res.fileId) {
+          this.mainEditorComponent.fileId = res.fileId;
+          if (res?.content != null) {
+
+            this.topBarComponent.exportEnabled = false;
+
+            let contentWidth = this.mainEditorComponent.content.nativeElement.clientWidth;
+            let contentHeight = this.mainEditorComponent.content.nativeElement.clientHeight;
+            let contentX = this.mainEditorComponent.content.nativeElement.offsetLeft;
+            let contentY = this.mainEditorComponent.content.nativeElement.offsetTop;
+
+            JSON.parse(res.content).forEach((element: any) => {
+              let changedWidth = (element.styleRelative.width) * contentWidth;
+              let changedHeight = (element.styleRelative.height) * contentHeight;
+
+              element.style.width = changedWidth;
+              element.style.height = changedHeight;
+
+              let changedX = contentX * element.positionRelative.x;//contentX + ((element.positionRelative.x) * contentX / 100);
+              let changedY = contentY * element.positionRelative.y;//contentY + ((element.positionRelative.y) * contentY / 100);
+
+              element.position = {
+                x: changedX,
+                y: changedY
+              };
+
+            });
+
+            this.elementService.changedElements.next(JSON.parse(res.content));
+          }
+        }
+      }
+    });
   }
+
 
   getSelectedFile() {
 

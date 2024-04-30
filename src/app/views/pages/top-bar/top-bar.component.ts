@@ -3,17 +3,23 @@ import { FolderService } from '../../../services/folder/folder.service';
 import { file, folder } from '../../../entities/customElements';
 import { SubFileComponent } from '../sub-file/sub-file.component';
 import { CommonModule } from '@angular/common';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { ElementService } from '../../../services/element/element.service';
-import { concatMap } from 'rxjs';
+import { concatMap, map, of } from 'rxjs';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { HttpService } from '../../../services/http/http.service';
 
 @Component({
   selector: 'app-top-bar',
   standalone: true,
-  imports: [SubFileComponent, CommonModule, ReactiveFormsModule, FormsModule, MatButtonModule, MatMenuModule],
+  imports: [SubFileComponent, CommonModule, ReactiveFormsModule, FormsModule, MatButtonModule, MatMenuModule, MatSelectModule
+    , MatFormFieldModule, MatInputModule
+  ],
   templateUrl: './top-bar.component.html',
   styleUrl: './top-bar.component.css',
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -23,6 +29,7 @@ export class TopBarComponent {
   @ViewChild('modal') modal!: ElementRef;
   @ViewChild('modal_second') modal_second!: ElementRef;
   @ViewChild('previewModal') previewModal!: ElementRef;
+  @ViewChild('exportModal') exportModal!: ElementRef;
   @ViewChild(SubFileComponent) subFileComponent!: SubFileComponent;
 
   folders: folder[] = [];
@@ -32,7 +39,7 @@ export class TopBarComponent {
   showFileCreator: boolean = false;
   newFileName: string = '';
 
-  constructor(private folderService: FolderService, private dialogService: DialogService, private elementService: ElementService, private fb: FormBuilder) {
+  constructor(private httpService: HttpService, private folderService: FolderService, private dialogService: DialogService, private elementService: ElementService, private fb: FormBuilder) {
     this.folderService.folders.asObservable().subscribe(res => {
       if (res != null)
         this.folders = [res]
@@ -59,20 +66,93 @@ export class TopBarComponent {
         this.selectedFile = res;
       }
     });*/
+
+    this.selectedFileId = this.folderService.selectedFileId.getValue();
+    this.selectedFile = this.folderService.selectedFile.getValue();
   }
 
   isNew: boolean = false;
   modalHeader: string = '';
   previewForm!: FormGroup;
+  exportForm!: FormGroup;
+  exportEnabled: boolean = true;
+
+  exportParams: any[] = [
+    { formControlName: "name", isRequired: true },
+    { formControlName: "appCode", isRequired: true },
+    { formControlName: "icon", isRequired: false },
+    { formControlName: "applicationStatus", isRequired: false },
+    { formControlName: "description", isRequired: false },
+    { formControlName: "access", isRequired: false },
+    { formControlName: "applicationId", isRequired: false },
+    { formControlName: "domain", isRequired: false },
+    { formControlName: "owner", isRequired: false },
+    { formControlName: "ownerId", isRequired: false },
+    { formControlName: "groups", isRequired: false },
+    { formControlName: "openerMethod", isRequired: false },
+    { formControlName: "applicationLink", isRequired: false },
+    { formControlName: "dashboards", isRequired: false },
+    { formControlName: "appType", isRequired: false },
+    { formControlName: "creationDate", isRequired: false },
+    { formControlName: "appCSS", isRequired: false },
+  ]
 
   ngOnInit() {
     this.previewForm = this.fb.group({
       prevcontrols: this.fb.array([])
     });
+
+    this.exportForm = this.fb.group({
+      "name": ['', Validators.required],
+      "appCode": ['', Validators.required],
+      "icon": ['',],
+      "applicationStatus": ['', Validators.required],
+      "description": ['',],
+      "access": ['', Validators.required],
+      "applicationId": ['',],
+      "domain": ['',],
+      "owner": ['beratbb13',],
+      "ownerId": ['',],
+      "groups": [[],],
+      "openerMethod": ['', Validators.required],
+      "applicationLink": ['',],
+      "dashboards": [[],],
+      "appType": ['', Validators.required],
+      "creationDate": ['',],
+      "appCSS": ['',],
+      //parameters: this.fb.array([])
+    });
+
+    //this.setExportParams();
+  }
+
+  get parameters(): FormArray {
+    return this.exportForm.get('parameters') as FormArray;
   }
 
   get prevcontrols(): FormArray {
     return this.previewForm.get('prevcontrols') as FormArray;
+  }
+
+  setExportParams() {
+    this.exportParams.forEach(param => {
+      const { formControlName, isRequired } = param;
+      let group: any;
+      if (isRequired) {
+        group = this.fb.group({
+          [formControlName]: ['', Validators.required]
+        });
+      } else {
+        group = this.fb.group({
+          [formControlName]: ['']
+        });
+      }
+      this.parameters.push(group);
+    });
+  }
+
+  closeExportModal() {
+    this.exportModal.nativeElement.style.display = 'none';
   }
 
   openModal(boolean: boolean) {
@@ -213,7 +293,7 @@ export class TopBarComponent {
     }
   }
 
-  selectedFileId!: number;
+  selectedFileId: number | null = null;
 
   toggleSelection(file: file) {
     file.isSelected = !file.isSelected;
@@ -247,6 +327,26 @@ export class TopBarComponent {
 
   saveChanges() {
     let elements = this.elementService.changedElements.getValue();
+    let content = this.folderService.content.getValue();
+
+    elements.forEach(element => {
+      let childLeft = element.position.x - content.x;
+      let childTop = element.position.y - content.y;
+
+      let childPercentageX = element.position.x / content.x;//(childLeft / content.width) * 100;
+      let childPercentageY = element.position.y / content.y;//(childTop / content.height) * 100;
+
+      element.styleRelative = {
+        width: (element.style.width / content.width),
+        height: (element.style.height / content.height),
+      };
+
+      element.positionRelative = {
+        x: childPercentageX,
+        y: childPercentageY
+      };
+    });
+
     let file: file | null = this.folderService.selectedFile.getValue();
     let fileId = this.folderService.selectedFileId.getValue();
     let stringify: string = ''
@@ -272,7 +372,7 @@ export class TopBarComponent {
             } else if (!foundedStat) {
               console.log('dosya bulunamadı');
             }
-
+ 
             this.foundedFolderIndex = -1;
             this.foundedFileIndex = -1;
           }*/
@@ -326,8 +426,48 @@ export class TopBarComponent {
     return rootFolders[0];
   }
 
+  openExportTemplate() {
+    this.exportModal.nativeElement.style.display = 'block';
+  }
 
+  exportTemplate() {
+    let file = this.folderService.selectedFile.getValue();
+    console.log(file);
+    debugger
+    if (file != null) {
+      if (this.exportForm.valid) {
+        if (file != null) {
+          let fileId = file.fileId;
+          this.httpService.addApplication(this.exportForm.value).pipe(
+            concatMap((res) => {
+              console.log(res);
+              if (res.result == true && res.message) {
+                return this.folderService.updateApplicationId(res.message, fileId);
+              } else {
+                return of(null);
+              }
+            }),
+            concatMap((res) => {
+              console.log(res);
+              if (res.result == true && res.message) {
+                return this.folderService.getFoldersByuserName('beratbb13');
+              }
+              return of(null);
+            }),
+          ).subscribe(res => {
+            console.log(res);
+            if (res.result = true && res.message) {
+              let response = res.message;
 
+              const tree = this.buildTree(response);
+              this.folderService.folders.next(tree);
+              this.closeExportModal();
+            }
+          });
+        }
+      }
+    }
+  }
 
   showOnPreview() {
     this.folderService.save.next(true);
@@ -335,6 +475,7 @@ export class TopBarComponent {
   }
 
   getFormControlKey(formGroup: AbstractControl): string {
+    console.log(formGroup);
     return Object.keys(formGroup.value)[0];
   }
 
