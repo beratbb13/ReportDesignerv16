@@ -40,6 +40,17 @@ export class PreviewComponent {
     return this.myForm.get('formArray') as FormArray;
   }
 
+  @ViewChild('previewContent') previewContent!: ElementRef;
+
+  returnInnerHTML() {
+    let cleaned = this.removeCommentsFromHTML(this.previewContent.nativeElement.outerHTML);
+    return cleaned;
+  }
+
+  removeCommentsFromHTML(htmlString: string) {
+    return htmlString.replace(/<!--[\s\S]*?-->/g, '');
+  }
+
   createFormElements(elements: any[]) {
     elements.forEach((element: any) => {
       this.controlName = element.name.toLowerCase();

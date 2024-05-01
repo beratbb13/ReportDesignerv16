@@ -32,6 +32,8 @@ export class FolderService {
     folders: [],
   });
   save: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  getFormHtml: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
 
   addFileByFolderId(folderId: number, fileName: string, username: string = 'beratbb13') {
     const body = {
@@ -137,4 +139,21 @@ export class FolderService {
       })
     );
   }
+
+  delete() {
+    const body = {
+      "Token": this.token,
+      "DataStoreId": Endpoints.formTemplatesDataStoreId,
+      "Operation": "delete",
+      "Data": `delete from form_files where id = 106`,
+      "Encrypted": "1951",
+    }
+    return this.http.post(Endpoints.dataops, body).pipe(
+      map((response: any) => {
+        return response;
+      })
+    );
+  }
+
+
 }

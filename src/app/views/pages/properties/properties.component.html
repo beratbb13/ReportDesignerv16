@@ -32,14 +32,21 @@
                 style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
                 (change)="onFileSelected($event, formGroup)" />
             }@case ('select'){
-
             <mat-select disableRipple [formControl]="getFormControlValue(formGroup)"
                 style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
-                *ngIf="getFormControlKey(formGroup) == 'type'">
+                *ngIf="getFormControlKey(formGroup) == 'type' && selectedElement.name == 'Textbox'">
                 <mat-option value="text">Text</mat-option>
+                <mat-option value="password">Password</mat-option>
                 <mat-option value="number">Number</mat-option>
                 <mat-option value="date">Date</mat-option>
                 <mat-option value="range">Range</mat-option>
+            </mat-select>
+
+            <mat-select disableRipple [formControl]="getFormControlValue(formGroup)"
+                style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
+                *ngIf="getFormControlKey(formGroup) == 'type' && selectedElement.name == 'Button'">
+                <mat-option value="text">Submit</mat-option>
+                <mat-option value="number">Reset</mat-option>
             </mat-select>
 
             <!--<select class="form-select"
@@ -53,7 +60,7 @@
 
             <mat-select disableRipple [formControl]="getFormControlValue(formGroup)"
                 style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
-                *ngIf="getFormControlKey(formGroup) == 'loading'">
+                *ngIf="getFormControlKey(formGroup) == 'loading' && selectedElement.name == 'Image'">
                 <mat-option value="auto">Auto</mat-option>
                 <mat-option value="eager">Eager</mat-option>
                 <mat-option value="lazy">Lazy</mat-option>
@@ -61,7 +68,7 @@
 
             <mat-select disableRipple [formControl]="getFormControlValue(formGroup)"
                 style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;"
-                *ngIf="getFormControlKey(formGroup) == 'decoding'">
+                *ngIf="getFormControlKey(formGroup) == 'decoding' && selectedElement.name == 'Image'">
                 <mat-option value="async">Async</mat-option>
                 <mat-option value="sync">sync</mat-option>
                 <mat-option value="auto">Auto</mat-option>

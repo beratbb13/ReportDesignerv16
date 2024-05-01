@@ -25,12 +25,11 @@ export class HttpService {
   }
 
   addApplication(parameters: any) {
-    console.log(parameters);
     const body = {
       "Application": parameters,
       "Token": this.token,
     }
-    return this.http.post('http://demo.bussion.com/api/V3/Applications/UpsertApplication', body).pipe(
+    return this.http.post(Endpoints.applications, body).pipe(
       map((response: any) => {
         return response;
       })

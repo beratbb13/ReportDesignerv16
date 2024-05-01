@@ -11,8 +11,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { FolderService } from './services/folder/folder.service';
-import helloWorldCss from './views/pages/main-editor/main-editor.component.css'
-
 
 @Component({
   selector: 'app-root',
@@ -23,16 +21,16 @@ import helloWorldCss from './views/pages/main-editor/main-editor.component.css'
 })
 export class AppComponent {
 
-
-  @HostListener('window:resize', ['$event'])
-  onResize(event: Event) {
-    let result = this.mainEditorComponent.returnHelloWorldCss();
+  onExport() {
+    let result = this.previewComponent.returnInnerHTML();
     console.log(result);
   }
 
   previewMode: boolean = false;
 
   @ViewChild(MainEditorComponent) mainEditorComponent!: MainEditorComponent;
+  @ViewChild(PreviewComponent) previewComponent!: PreviewComponent;
+
   @ViewChild(TopBarComponent) topBarComponent!: TopBarComponent;
   constructor(private elementService: ElementService, private folderService: FolderService) {
     this.elementService.previewMode.asObservable().subscribe(res => {
@@ -46,12 +44,23 @@ export class AppComponent {
         }
       }
     });
+
+    this.folderService.getFormHtml.asObservable().subscribe(res => {
+      if (res) {
+        this.elementService.previewMode.next(true);
+        setTimeout(() => {
+          this.onExport();
+        }, 1000);
+      }
+    });
+
   }
 
   ngOnInit() {
-    this.getSavedTemplate();
+
+    //this.getSavedTemplate();
     this.getFolders();
-    this.getSelectedFile();
+    //this.getSelectedFile();
 
     this.folderService.selectedFile.asObservable().subscribe(res => {
       if (res) {
@@ -61,7 +70,7 @@ export class AppComponent {
           this.mainEditorComponent.fileId = res.fileId;
           if (res?.content != null) {
 
-            this.topBarComponent.exportEnabled = false;
+            this.topBarComponent.exportDisabled = false;
 
             let contentWidth = this.mainEditorComponent.content.nativeElement.clientWidth;
             let contentHeight = this.mainEditorComponent.content.nativeElement.clientHeight;
@@ -86,7 +95,10 @@ export class AppComponent {
             });
 
             this.elementService.changedElements.next(JSON.parse(res.content));
+          } else {
+            this.elementService.changedElements.next([]);
           }
+
         }
       }
     });

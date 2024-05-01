@@ -4,7 +4,6 @@ import { CdkDrag, CdkDragEnd } from '@angular/cdk/drag-drop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { FolderService } from '../../../services/folder/folder.service';
-import mainEditorCSS from './main-editor.component.css'
 
 export type ResizeDirectionType = 'x' | 'y' | 'xy' | 't' | 'l';
 
@@ -16,12 +15,6 @@ export type ResizeDirectionType = 'x' | 'y' | 'xy' | 't' | 'l';
   styleUrl: './main-editor.component.css'
 })
 export class MainEditorComponent {
-
-
-  returnHelloWorldCss() {
-    console.log('returnHelloWorldCss')
-    return this.content.nativeElement.innerHTML;
-  }
 
   @ViewChild('boundaryRef') boundaryElement!: ElementRef;
   @ViewChild('content') content!: ElementRef;

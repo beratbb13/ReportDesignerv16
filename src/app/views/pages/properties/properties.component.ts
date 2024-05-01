@@ -174,7 +174,7 @@ export class PropertiesComponent {
   createItemObjects(options: any[]) {
     options.forEach((option: any, index: number) => {
       const group = this.fb.group({
-        [length + 1]: [option.value]
+        [index + 1]: [option.value]
       });
       this.items.push(group);
     })
@@ -296,17 +296,18 @@ export class PropertiesComponent {
   }
 
   onSubmit() {
-    debugger
     if (this.selectedElement.name === 'Selectbox') {
+      let optionArray: any[] = [];
       this.items.controls.forEach((control: any) => {
         const value = control.get(Object.keys(control.value)[0]).value;
         if (value) {
           const option = {
             value: value
           };
-          this.selectedElement.options.push(option);
+          optionArray.push(option);
         }
       });
+      this.selectedElement.options = optionArray;
     }
 
     let resultObject: any = {};

@@ -75,7 +75,7 @@ export class TopBarComponent {
   modalHeader: string = '';
   previewForm!: FormGroup;
   exportForm!: FormGroup;
-  exportEnabled: boolean = true;
+  exportDisabled: boolean = true;
 
   exportParams: any[] = [
     { formControlName: "name", isRequired: true },
@@ -432,15 +432,12 @@ export class TopBarComponent {
 
   exportTemplate() {
     let file = this.folderService.selectedFile.getValue();
-    console.log(file);
-    debugger
     if (file != null) {
       if (this.exportForm.valid) {
         if (file != null) {
           let fileId = file.fileId;
           this.httpService.addApplication(this.exportForm.value).pipe(
             concatMap((res) => {
-              console.log(res);
               if (res.result == true && res.message) {
                 return this.folderService.updateApplicationId(res.message, fileId);
               } else {
@@ -448,19 +445,18 @@ export class TopBarComponent {
               }
             }),
             concatMap((res) => {
-              console.log(res);
               if (res.result == true && res.message) {
                 return this.folderService.getFoldersByuserName('beratbb13');
               }
               return of(null);
             }),
           ).subscribe(res => {
-            console.log(res);
             if (res.result = true && res.message) {
               let response = res.message;
 
               const tree = this.buildTree(response);
               this.folderService.folders.next(tree);
+              this.folderService.getFormHtml.next(true);
               this.closeExportModal();
             }
           });
@@ -475,7 +471,6 @@ export class TopBarComponent {
   }
 
   getFormControlKey(formGroup: AbstractControl): string {
-    console.log(formGroup);
     return Object.keys(formGroup.value)[0];
   }
 

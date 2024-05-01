@@ -31,16 +31,16 @@
           }} </label>
 
         <input
-          *ngIf="elementRef.tag === 'input' && (elementRef.attributes.type === 'text' || elementRef.attributes.type === 'number' || elementRef.attributes.type === 'date')"
-          [id]="elementRef.id" [style.width.px]=" elementRef.style.width" [style.height.px]="elementRef.style.height"
-          [style.fontSize.px]="elementRef.style.fontSize" [style.color]="elementRef.style.color"
-          [style.backgroundColor]="elementRef.style.backgroundColor" [style.fontWeight]="elementRef.style.fontWeight"
-          [style.fontStyle]="elementRef.style.fontStyle" [style.textDecoration]="elementRef.style.textDecoration"
-          [style.textAlign]="elementRef.style.textAlign" [style.fontFamily]="elementRef.style.fontFamily"
-          [type]="elementRef.attributes.type" [value]="elementRef.attributes.value"
-          [readonly]="elementRef.attributes.readonly" [required]="elementRef.attributes.required"
-          [placeholder]="elementRef.attributes.placeholder" [autocomplete]="elementRef.attributes.autocomplete"
-          [autocapitalize]="elementRef.attributes.autocapitalize"
+          *ngIf="elementRef.tag === 'input' && (elementRef.attributes.type === 'text' || elementRef.attributes.type === 'number' || elementRef.attributes.type === 'date' || elementRef.attributes.type === 'password')"
+          [id]="elementRef.id" [name]="elementRef.formControlName" [style.width.px]="elementRef.style.width"
+          [style.height.px]="elementRef.style.height" [style.fontSize.px]="elementRef.style.fontSize"
+          [style.color]="elementRef.style.color" [style.backgroundColor]="elementRef.style.backgroundColor"
+          [style.fontWeight]="elementRef.style.fontWeight" [style.fontStyle]="elementRef.style.fontStyle"
+          [style.textDecoration]="elementRef.style.textDecoration" [style.textAlign]="elementRef.style.textAlign"
+          [style.fontFamily]="elementRef.style.fontFamily" [type]="elementRef.attributes.type"
+          [value]="elementRef.attributes.value" [readonly]="elementRef.attributes.readonly"
+          [required]="elementRef.attributes.required" [placeholder]="elementRef.attributes.placeholder"
+          [autocomplete]="elementRef.attributes.autocomplete" [autocapitalize]="elementRef.attributes.autocapitalize"
           [style.borderRadius.px]="elementRef.style.borderRadius" [style.border]="elementRef.style.border"
           [attr.aria-describedby]="elementRef.attributes.ariaDescribedby" (dblclick)="isDragDisabled = !isDragDisabled"
           (click)="onFocus($event, elementRef)">
@@ -53,14 +53,14 @@
           [draggable]="elementRef.attributes.draggable" (dblclick)="isDragDisabled = !isDragDisabled"
           (click)="onFocus($event, elementRef)">
 
-        <select *ngIf="elementRef.tag === 'select'" [id]="elementRef.id" [style.width.px]="elementRef.style.width"
-          [style.height.px]="elementRef.style.height" [style.fontSize.px]="elementRef.style.fontSize"
-          [style.color]="elementRef.style.color" [style.backgroundColor]="elementRef.style.backgroundColor"
-          [style.fontWeight]="elementRef.style.fontWeight" [style.fontStyle]="elementRef.style.fontStyle"
-          [style.textDecoration]="elementRef.style.textDecoration" [style.textAlign]="elementRef.style.textAlign"
-          [style.borderRadius.px]="elementRef.style.borderRadius" [style.border]="elementRef.style.border"
-          [style.fontFamily]="elementRef.style.fontFamily" (dblclick)="isDragDisabled = !isDragDisabled"
-          (click)="onFocus($event, elementRef)">
+        <select *ngIf="elementRef.tag === 'select'" [id]="elementRef.id" [name]="elementRef.formControlName"
+          [style.width.px]="elementRef.style.width" [style.height.px]="elementRef.style.height"
+          [style.fontSize.px]="elementRef.style.fontSize" [style.color]="elementRef.style.color"
+          [style.backgroundColor]="elementRef.style.backgroundColor" [style.fontWeight]="elementRef.style.fontWeight"
+          [style.fontStyle]="elementRef.style.fontStyle" [style.textDecoration]="elementRef.style.textDecoration"
+          [style.textAlign]="elementRef.style.textAlign" [style.borderRadius.px]="elementRef.style.borderRadius"
+          [style.border]="elementRef.style.border" [style.fontFamily]="elementRef.style.fontFamily"
+          (dblclick)="isDragDisabled = !isDragDisabled" (click)="onFocus($event, elementRef)">
           @for(option of elementRef.options; track option){
           <option> {{ option.value}} </option>
           }
@@ -79,7 +79,8 @@
           (click)="onFocus($event, elementRef)" (dblclick)="isDragDisabled = !isDragDisabled" [id]="elementRef.id"
           class="d-flex justify-content-center align-items-center" [style.width.px]="elementRef.style.width"
           [style.height.px]="elementRef.style.height" [style.backgroundColor]="elementRef.style.backgroundColor">
-          <input [type]="elementRef.attributes.type" [disabled]="elementRef.attributes.disabled"
+          <input [type]="elementRef.attributes.type" [name]="elementRef.formControlName"
+            [value]="elementRef.attributes.value" [disabled]="elementRef.attributes.disabled"
             [style.width.px]="elementRef.style.height" [style.height.px]="elementRef.style.height"
             [style.borderRadius.px]="elementRef.style.borderRadius" [style.border]="elementRef.style.border">
           &nbsp;
@@ -95,9 +96,9 @@
           class="d-flex justify-content-center align-items-center" [style.width.px]="elementRef.style.width"
           [style.height.px]="elementRef.style.height" [style.backgroundColor]="elementRef.style.backgroundColor">
           <input [type]="elementRef.attributes.type" [name]="elementRef.attributes.name"
-            [style.width.px]="elementRef.style.height" [style.height.px]="elementRef.style.height"
-            [style.borderRadius.px]="elementRef.style.borderRadius" [style.border]="elementRef.style.border"
-            [disabled]="elementRef.attributes.disabled">
+            [value]="elementRef.attributes.value" [style.width.px]="elementRef.style.height"
+            [style.height.px]="elementRef.style.height" [style.borderRadius.px]="elementRef.style.borderRadius"
+            [style.border]="elementRef.style.border" [disabled]="elementRef.attributes.disabled">
           &nbsp;
           <label [style.fontSize.px]="elementRef.style.fontSize" [style.color]="elementRef.style.color"
             [style.fontWeight]="elementRef.style.fontWeight" [style.fontStyle]="elementRef.style.fontStyle"
