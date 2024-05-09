@@ -10,8 +10,8 @@ describe('TopBarComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TopBarComponent]
     })
-    .compileComponents();
-    
+      .compileComponents();
+
     fixture = TestBed.createComponent(TopBarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

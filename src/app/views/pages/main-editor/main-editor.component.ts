@@ -1,6 +1,6 @@
 import { Component, ElementRef, HostListener, Inject, Input, ViewChild } from '@angular/core';
 import { ElementService } from '../../../services/element/element.service';
-import { CdkDrag, CdkDragEnd } from '@angular/cdk/drag-drop';
+import { CdkDrag } from '@angular/cdk/drag-drop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { FolderService } from '../../../services/folder/folder.service';
@@ -31,7 +31,7 @@ export class MainEditorComponent {
   contentYStart: number = 0;
   contentXEnd: number = 0;
   contentYEnd: number = 0;
-
+  contentJSON: string = 'Choose a file';
   constructor(
     private elementService: ElementService,
     private folderService: FolderService,
@@ -58,6 +58,8 @@ export class MainEditorComponent {
     let contentHeight = this.content.nativeElement.clientHeight;
     let contentX = this.content.nativeElement.offsetLeft;
     let contentY = this.content.nativeElement.offsetTop;
+    let contentXEnd = contentX + contentWidth;
+    let contentYEnd = contentY + contentHeight;
 
     this.elements.forEach(element => {
       let changedWidth = (element.styleRelative.width) * contentWidth;
@@ -66,13 +68,15 @@ export class MainEditorComponent {
       element.style.width = changedWidth;
       element.style.height = changedHeight;
 
-      let changedX = contentX * element.positionRelative.x//contentX + ((element.positionRelative.x) * contentX / 100);
-      let changedY = contentY * element.positionRelative.y//contentY + ((element.positionRelative.y) * contentY / 100);
+      let changedX = contentX * element.positionRelative.x //contentX + ((element.positionRelative.x) * contentX / 100);
+      let changedY = contentY * element.positionRelative.y //contentY + ((element.positionRelative.y) * contentY / 100);
 
-      element.position = {
-        x: changedX,
-        y: changedY
-      };
+      if ((changedX > contentX && changedX < contentXEnd) && (changedY > contentY && changedY < contentYEnd)) {
+        element.position = {
+          x: changedX,
+          y: changedY
+        };
+      }
     });
 
     this.elementService.changedElements.next(this.elements);
@@ -186,14 +190,21 @@ export class MainEditorComponent {
     direction: ResizeDirectionType,
     element: any
   ): void {
+    //console.log(element.style.width)
+    //console.log(element.style.height)
+    $event.preventDefault();
     this.isDragDisabled = true;
     element.isDragDisabled = true;
+
+    let bounds = document.getElementById(element.id)?.getBoundingClientRect();
+
     const mouseX = $event.clientX;
     const mouseY = $event.clientY;
+
     const dimensionWidth =
-      this.resizeCornerRef.nativeElement.parentNode.offsetWidth;
+      bounds?.width || 0;//this.resizeCornerRef.nativeElement.parentNode.offsetWidth;
     const dimensionHeight =
-      this.resizeCornerRef.nativeElement.parentNode.offsetHeight;
+      bounds?.height || 0;//this.resizeCornerRef.nativeElement.parentNode.offsetHeight;
 
     const duringResize = (e: any) => {
       let dw = dimensionWidth;
@@ -219,10 +230,17 @@ export class MainEditorComponent {
       }
     };
 
-    this.elementService.selectedElement.next(element);
-
     const finishResize = (e: any) => {
+
       this.isDragDisabled = false;
+
+      let index = this.elements.findIndex(el => el.id === element.id);
+
+      if (index !== -1) {
+        this.elements[index] = element;
+      }
+      this.elementService.changedElements.next(this.elements);
+
       this._document.removeEventListener('mousemove', duringResize);
       this._document.removeEventListener('mouseup', finishResize);
     };
@@ -230,8 +248,6 @@ export class MainEditorComponent {
     this._document.addEventListener('mousemove', duringResize);
     this._document.addEventListener('mouseup', finishResize);
   }
-
-  contentJSON: string = 'Choose a file';
 
   createForm(parsedJson: any[]) {
     this.elementService.elements.next(parsedJson);

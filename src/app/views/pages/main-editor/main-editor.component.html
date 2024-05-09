@@ -1,4 +1,7 @@
-<div #content id="content" style="
+<div
+  #content
+  id="content"
+  style="
     border: 3px solid black;
     display: flex;
     justify-content: center;
@@ -6,130 +9,260 @@
     overflow: auto;
     width: 100%;
     height: 90vh;
-  ">
+  "
+>
   <div class="example-boundary" *ngIf="fileId !== 0" #boundaryRef>
     @for(elementRef of elements; track elementRef){
-    <div #wrapper class="frame-wrapper example-box"
-      style="position: absolute; background-color: transparent !important;" cdkDragBoundary=".example-boundary" cdkDrag
+    <div
+      #wrapper
+      class="frame-wrapper example-box"
+      style="position: absolute; background-color: transparent !important"
+      cdkDragBoundary=".example-boundary"
+      cdkDrag
       [ngStyle]="{
         'left.px': elementRef.position.x,
         'top.px': elementRef.position.y
-      }" [cdkDragDisabled]="isDragDisabled">
-
-      <div class="content-wrapper"
-        style="display: flex; justify-content: center; align-items: center; overflow: hidden;  background-color: transparent !important;"
-        [style.width.px]="elementRef.style.width" [style.height.px]="elementRef.style.height"
-        (contextmenu)="removeElement($event, elementRef)">
-
-        <label *ngIf="elementRef.tag === 'label'" style="align-content: center;" [id]="elementRef.id"
-          [style.width.px]=" elementRef.style.width" [style.height.px]="elementRef.style.height"
-          [style.fontSize.px]="elementRef.style.fontSize" [style.color]="elementRef.style.color"
-          [style.backgroundColor]="elementRef.style.backgroundColor" [style.fontWeight]="elementRef.style.fontWeight"
-          [style.fontStyle]="elementRef.style.fontStyle" [style.textDecoration]="elementRef.style.textDecoration"
-          [style.textAlign]="elementRef.style.textAlign" (dblclick)="isDragDisabled = !isDragDisabled"
-          (click)="onFocus($event, elementRef)"> {{ elementRef.attributes.value
-          }} </label>
+      }"
+      [cdkDragDisabled]="isDragDisabled"
+    >
+      <div
+        class="content-wrapper"
+        style="
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          overflow: hidden;
+          background-color: transparent !important;
+        "
+        [style.width.px]="elementRef.style.width"
+        [style.height.px]="elementRef.style.height"
+        (contextmenu)="removeElement($event, elementRef)"
+      >
+        <label
+          *ngIf="elementRef.tag === 'label'"
+          style="align-content: center"
+          [id]="elementRef.id"
+          [style.width.px]="elementRef.style.width"
+          [style.height.px]="elementRef.style.height"
+          [style.fontSize.px]="elementRef.style.fontSize"
+          [style.color]="elementRef.style.color"
+          [style.backgroundColor]="elementRef.style.backgroundColor"
+          [style.fontWeight]="elementRef.style.fontWeight"
+          [style.fontStyle]="elementRef.style.fontStyle"
+          [style.textDecoration]="elementRef.style.textDecoration"
+          [style.textAlign]="elementRef.style.textAlign"
+          (dblclick)="isDragDisabled = !isDragDisabled"
+          (click)="onFocus($event, elementRef)"
+        >
+          {{ elementRef.attributes.value }}
+        </label>
 
         <input
-          *ngIf="elementRef.tag === 'input' && (elementRef.attributes.type === 'text' || elementRef.attributes.type === 'number' || elementRef.attributes.type === 'date' || elementRef.attributes.type === 'password')"
-          [id]="elementRef.id" [name]="elementRef.formControlName" [style.width.px]="elementRef.style.width"
-          [style.height.px]="elementRef.style.height" [style.fontSize.px]="elementRef.style.fontSize"
-          [style.color]="elementRef.style.color" [style.backgroundColor]="elementRef.style.backgroundColor"
-          [style.fontWeight]="elementRef.style.fontWeight" [style.fontStyle]="elementRef.style.fontStyle"
-          [style.textDecoration]="elementRef.style.textDecoration" [style.textAlign]="elementRef.style.textAlign"
-          [style.fontFamily]="elementRef.style.fontFamily" [type]="elementRef.attributes.type"
-          [value]="elementRef.attributes.value" [readonly]="elementRef.attributes.readonly"
-          [required]="elementRef.attributes.required" [placeholder]="elementRef.attributes.placeholder"
-          [autocomplete]="elementRef.attributes.autocomplete" [autocapitalize]="elementRef.attributes.autocapitalize"
-          [style.borderRadius.px]="elementRef.style.borderRadius" [style.border]="elementRef.style.border"
-          [attr.aria-describedby]="elementRef.attributes.ariaDescribedby" (dblclick)="isDragDisabled = !isDragDisabled"
-          (click)="onFocus($event, elementRef)">
+          *ngIf="
+            elementRef.tag === 'input' &&
+            (elementRef.attributes.type === 'text' ||
+              elementRef.attributes.type === 'number' ||
+              elementRef.attributes.type === 'date' ||
+              elementRef.attributes.type === 'password')
+          "
+          [id]="elementRef.id"
+          [name]="elementRef.formControlName"
+          [style.width.px]="elementRef.style.width"
+          [style.height.px]="elementRef.style.height"
+          [style.fontSize.px]="elementRef.style.fontSize"
+          [style.color]="elementRef.style.color"
+          [style.backgroundColor]="elementRef.style.backgroundColor"
+          [style.fontWeight]="elementRef.style.fontWeight"
+          [style.fontStyle]="elementRef.style.fontStyle"
+          [style.textDecoration]="elementRef.style.textDecoration"
+          [style.textAlign]="elementRef.style.textAlign"
+          [style.fontFamily]="elementRef.style.fontFamily"
+          [type]="elementRef.attributes.type"
+          [value]="elementRef.attributes.value"
+          [readonly]="elementRef.attributes.readonly"
+          [required]="elementRef.attributes.required"
+          [placeholder]="elementRef.attributes.placeholder"
+          [autocomplete]="elementRef.attributes.autocomplete"
+          [autocapitalize]="elementRef.attributes.autocapitalize"
+          [style.borderRadius.px]="elementRef.style.borderRadius"
+          [style.border]="elementRef.style.border"
+          [attr.aria-describedby]="elementRef.attributes.ariaDescribedby"
+          (dblclick)="isDragDisabled = !isDragDisabled"
+          (click)="onFocus($event, elementRef)"
+        />
 
-        <img *ngIf="elementRef.tag === 'img'" [id]="elementRef.id" [src]="elementRef.attributes.src"
-          [alt]="elementRef.attributes.alt" [style.width.px]="elementRef.style.width"
-          [style.height.px]="elementRef.style.height" [title]="elementRef.attributes.title"
-          [loading]="elementRef.attributes.loading" [style.borderRadius.px]="elementRef.style.borderRadius"
-          [style.border]="elementRef.style.border" [decoding]="elementRef.attributes.decoding"
-          [draggable]="elementRef.attributes.draggable" (dblclick)="isDragDisabled = !isDragDisabled"
-          (click)="onFocus($event, elementRef)">
+        <img
+          *ngIf="elementRef.tag === 'img'"
+          [id]="elementRef.id"
+          [src]="elementRef.attributes.src"
+          [alt]="elementRef.attributes.alt"
+          [style.width.px]="elementRef.style.width"
+          [style.height.px]="elementRef.style.height"
+          [title]="elementRef.attributes.title"
+          [loading]="elementRef.attributes.loading"
+          [style.borderRadius.px]="elementRef.style.borderRadius"
+          [style.border]="elementRef.style.border"
+          [decoding]="elementRef.attributes.decoding"
+          [draggable]="elementRef.attributes.draggable"
+          (dblclick)="isDragDisabled = !isDragDisabled"
+          (click)="onFocus($event, elementRef)"
+        />
 
-        <select *ngIf="elementRef.tag === 'select'" [id]="elementRef.id" [name]="elementRef.formControlName"
-          [style.width.px]="elementRef.style.width" [style.height.px]="elementRef.style.height"
-          [style.fontSize.px]="elementRef.style.fontSize" [style.color]="elementRef.style.color"
-          [style.backgroundColor]="elementRef.style.backgroundColor" [style.fontWeight]="elementRef.style.fontWeight"
-          [style.fontStyle]="elementRef.style.fontStyle" [style.textDecoration]="elementRef.style.textDecoration"
-          [style.textAlign]="elementRef.style.textAlign" [style.borderRadius.px]="elementRef.style.borderRadius"
-          [style.border]="elementRef.style.border" [style.fontFamily]="elementRef.style.fontFamily"
-          (dblclick)="isDragDisabled = !isDragDisabled" (click)="onFocus($event, elementRef)">
+        <select
+          *ngIf="elementRef.tag === 'select'"
+          [id]="elementRef.id"
+          [name]="elementRef.formControlName"
+          [style.width.px]="elementRef.style.width"
+          [style.height.px]="elementRef.style.height"
+          [style.fontSize.px]="elementRef.style.fontSize"
+          [style.color]="elementRef.style.color"
+          [style.backgroundColor]="elementRef.style.backgroundColor"
+          [style.fontWeight]="elementRef.style.fontWeight"
+          [style.fontStyle]="elementRef.style.fontStyle"
+          [style.textDecoration]="elementRef.style.textDecoration"
+          [style.textAlign]="elementRef.style.textAlign"
+          [style.borderRadius.px]="elementRef.style.borderRadius"
+          [style.border]="elementRef.style.border"
+          [style.fontFamily]="elementRef.style.fontFamily"
+          (dblclick)="isDragDisabled = !isDragDisabled"
+          (click)="onFocus($event, elementRef)"
+        >
           @for(option of elementRef.options; track option){
-          <option> {{ option.value}} </option>
+          <option>{{ option.value }}</option>
           }
         </select>
 
-        <button *ngIf="elementRef.tag === 'button'" [id]="elementRef.id" [style.width.px]="elementRef.style.width"
-          [style.height.px]="elementRef.style.height" [style.color]="elementRef.style.color"
-          [style.fontSize.px]="elementRef.style.fontSize" [style.backgroundColor]="elementRef.style.backgroundColor"
-          [type]="elementRef.attributes.type" [style.textAlign]="elementRef.style.textAlign"
-          [style.borderRadius.px]="elementRef.style.borderRadius" [style.border]="elementRef.style.border"
-          [disabled]="elementRef.attributes.disabled" (click)="onFocus($event, elementRef)"
-          (dblclick)="isDragDisabled = !isDragDisabled">{{
-          elementRef.attributes.value }}</button>
+        <button
+          *ngIf="elementRef.tag === 'button'"
+          [id]="elementRef.id"
+          [style.width.px]="elementRef.style.width"
+          [style.height.px]="elementRef.style.height"
+          [style.color]="elementRef.style.color"
+          [style.fontSize.px]="elementRef.style.fontSize"
+          [style.backgroundColor]="elementRef.style.backgroundColor"
+          [type]="elementRef.attributes.type"
+          [style.textAlign]="elementRef.style.textAlign"
+          [style.borderRadius.px]="elementRef.style.borderRadius"
+          [style.border]="elementRef.style.border"
+          [disabled]="elementRef.attributes.disabled"
+          [style.textDecoration]="elementRef.style.textDecoration"
+          (click)="onFocus($event, elementRef)"
+          (dblclick)="isDragDisabled = !isDragDisabled"
+        >
+          {{ elementRef.attributes.value }}
+        </button>
 
-        <span *ngIf="elementRef.tag === 'input' && elementRef.attributes.type === 'checkbox'"
-          (click)="onFocus($event, elementRef)" (dblclick)="isDragDisabled = !isDragDisabled" [id]="elementRef.id"
-          class="d-flex justify-content-center align-items-center" [style.width.px]="elementRef.style.width"
-          [style.height.px]="elementRef.style.height" [style.backgroundColor]="elementRef.style.backgroundColor">
-          <input [type]="elementRef.attributes.type" [name]="elementRef.formControlName"
-            [value]="elementRef.attributes.value" [disabled]="elementRef.attributes.disabled"
-            [style.width.px]="elementRef.style.height" [style.height.px]="elementRef.style.height"
-            [style.borderRadius.px]="elementRef.style.borderRadius" [style.border]="elementRef.style.border">
+        <span
+          style="display: flex; justify-content: start; align-items: center"
+          *ngIf="
+            elementRef.tag === 'input' &&
+            elementRef.attributes.type === 'checkbox'
+          "
+          (click)="onFocus($event, elementRef)"
+          (dblclick)="isDragDisabled = !isDragDisabled"
+          [id]="elementRef.id"
+          [style.width.px]="elementRef.style.width"
+          [style.height.px]="elementRef.style.height"
+          [style.backgroundColor]="elementRef.style.backgroundColor"
+        >
+          <input
+            [type]="elementRef.attributes.type"
+            [name]="elementRef.formControlName"
+            [value]="elementRef.attributes.value"
+            [disabled]="elementRef.attributes.disabled"
+            [style.width.px]="elementRef.style.height"
+            [style.height.px]="elementRef.style.height"
+            [style.borderRadius.px]="elementRef.style.borderRadius"
+            [style.border]="elementRef.style.border"
+          />
           &nbsp;
-          <label [style.fontSize.px]="elementRef.style.fontSize" [style.color]="elementRef.style.color"
-            [style.backgroundColor]="elementRef.style.backgroundColor" [style.fontWeight]="elementRef.style.fontWeight"
-            [style.fontStyle]="elementRef.style.fontStyle" [style.textDecoration]="elementRef.style.textDecoration"
-            [style.textAlign]="elementRef.style.textAlign"> {{
-            elementRef.attributes.value }} </label>
+          <label
+            [style.fontSize.px]="elementRef.style.fontSize"
+            [style.color]="elementRef.style.color"
+            [style.backgroundColor]="elementRef.style.backgroundColor"
+            [style.fontWeight]="elementRef.style.fontWeight"
+            [style.fontStyle]="elementRef.style.fontStyle"
+            [style.textDecoration]="elementRef.style.textDecoration"
+            [style.textAlign]="elementRef.style.textAlign"
+          >
+            {{ elementRef.attributes.value }}
+          </label>
         </span>
 
-        <span *ngIf="elementRef.tag === 'input' && elementRef.attributes.type === 'radio'"
-          (click)="onFocus($event, elementRef)" [id]="elementRef.id" (dblclick)="isDragDisabled = !isDragDisabled"
-          class="d-flex justify-content-center align-items-center" [style.width.px]="elementRef.style.width"
-          [style.height.px]="elementRef.style.height" [style.backgroundColor]="elementRef.style.backgroundColor">
-          <input [type]="elementRef.attributes.type" [name]="elementRef.attributes.name"
-            [value]="elementRef.attributes.value" [style.width.px]="elementRef.style.height"
-            [style.height.px]="elementRef.style.height" [style.borderRadius.px]="elementRef.style.borderRadius"
-            [style.border]="elementRef.style.border" [disabled]="elementRef.attributes.disabled">
+        <span
+          style="display: flex; justify-content: start; align-items: center"
+          *ngIf="
+            elementRef.tag === 'input' && elementRef.attributes.type === 'radio'
+          "
+          (click)="onFocus($event, elementRef)"
+          [id]="elementRef.id"
+          (dblclick)="isDragDisabled = !isDragDisabled"
+          [style.width.px]="elementRef.style.width"
+          [style.height.px]="elementRef.style.height"
+          [style.backgroundColor]="elementRef.style.backgroundColor"
+        >
+          <input
+            [type]="elementRef.attributes.type"
+            [name]="elementRef.attributes.name"
+            [value]="elementRef.attributes.value"
+            [style.width.px]="elementRef.style.height"
+            [style.height.px]="elementRef.style.height"
+            [style.borderRadius.px]="elementRef.style.borderRadius"
+            [style.border]="elementRef.style.border"
+            [disabled]="elementRef.attributes.disabled"
+          />
           &nbsp;
-          <label [style.fontSize.px]="elementRef.style.fontSize" [style.color]="elementRef.style.color"
-            [style.fontWeight]="elementRef.style.fontWeight" [style.fontStyle]="elementRef.style.fontStyle"
-            [style.textDecoration]="elementRef.style.textDecoration" [style.textAlign]="elementRef.style.textAlign"> {{
-            elementRef.attributes.value }} </label>
+          <label
+            [style.fontSize.px]="elementRef.style.fontSize"
+            [style.color]="elementRef.style.color"
+            [style.fontWeight]="elementRef.style.fontWeight"
+            [style.fontStyle]="elementRef.style.fontStyle"
+            [style.textDecoration]="elementRef.style.textDecoration"
+            [style.textAlign]="elementRef.style.textAlign"
+          >
+            {{ elementRef.attributes.value }}
+          </label>
         </span>
-
       </div>
-      <div class="resizers" [style.width.px]="elementRef.style.width" [style.height.px]="elementRef.style.height">
-        <div (mousedown)="
-            startResize($event, 'x', elementRef);
-            isDragDisabled = true
-          " (mouseup)="isDragDisabled = false" class="resizer right">
-        </div>
+      <div
+        class="resizers"
+        [style.width.px]="elementRef.style.width"
+        [style.height.px]="elementRef.style.height"
+      >
+        <div
+          (mousedown)="
+            startResize($event, 'x', elementRef); isDragDisabled = true
+          "
+          (mouseup)="isDragDisabled = false"
+          class="resizer right"
+        ></div>
 
-        <div #resizeCorner (mousedown)="
-            startResize($event, 'y', elementRef);
-            isDragDisabled = true
-          " (mouseup)="isDragDisabled = false" class="resizer bottom">
-        </div>
-        <div #resizeCorner (mousedown)="
-            startResize($event, 'xy', elementRef);
-            isDragDisabled = true
-          " (mouseup)="isDragDisabled = false" class="resizer bottom-right"></div>
+        <div
+          #resizeCorner
+          (mousedown)="
+            startResize($event, 'y', elementRef); isDragDisabled = true
+          "
+          (mouseup)="isDragDisabled = false"
+          class="resizer bottom"
+        ></div>
+        <div
+          #resizeCorner
+          (mousedown)="
+            startResize($event, 'xy', elementRef); isDragDisabled = true
+          "
+          (mouseup)="isDragDisabled = false"
+          class="resizer bottom-right"
+        ></div>
       </div>
     </div>
     }
   </div>
-  <div class="example-boundary d-flex justify-content-center align-items-center" style="background-color: gray;"
-    *ngIf="fileId === 0">
-    <div style="font-size: 40px; z-index: 1;">
+  <div
+    class="example-boundary d-flex justify-content-center align-items-center"
+    style="background-color: gray"
+    *ngIf="fileId === 0"
+  >
+    <div style="font-size: 40px; z-index: 1">
       {{ contentJSON }}
     </div>
   </div>

@@ -13,11 +13,11 @@ export class HttpService {
   constructor(private http: HttpClient, private authService: AuthService) { }
 
   getApi(endPoint: string, attributes: any) {
-    return this.http.get(`http://localhost:3000/${endPoint}`, attributes);
+    return this.http.get(endPoint, attributes);
   }
 
   postApi(endPoint: string, attributes: any) {
-    return this.http.post(`http://localhost:3000/${endPoint}`, attributes);
+    return this.http.post(endPoint, attributes);
   }
 
   getSelectValues(endPoint: string) {

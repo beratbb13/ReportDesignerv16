@@ -1,4 +1,4 @@
-export interface textbox {
+export interface input {
     text: string,
     fontSize: number,
     fontColor: string,
@@ -92,7 +92,7 @@ export interface htmlTemplate {
         y: number
     }
     isDragDisabled: boolean,
-    element: textbox | textarea | label | table | combobox | option
+    element: input | textarea | label | table | combobox | option
     | checkbox | radioButton | image | link | button | listbox
 }
 

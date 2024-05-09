@@ -10,8 +10,8 @@ describe('SubFileComponent', () => {
     await TestBed.configureTestingModule({
       imports: [SubFileComponent]
     })
-    .compileComponents();
-    
+      .compileComponents();
+
     fixture = TestBed.createComponent(SubFileComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

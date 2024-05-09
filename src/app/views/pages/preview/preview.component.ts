@@ -17,6 +17,7 @@ export class PreviewComponent {
   constructor(private elementService: ElementService, private fb: FormBuilder, private http: HttpService) { }
 
   @ViewChild('content', { static: true }) content!: ElementRef;
+  @ViewChild('previewContent') previewContent!: ElementRef;
   elements: any[] = [];
   myForm!: FormGroup;
   controlName: string = '';
@@ -40,8 +41,6 @@ export class PreviewComponent {
     return this.myForm.get('formArray') as FormArray;
   }
 
-  @ViewChild('previewContent') previewContent!: ElementRef;
-
   returnInnerHTML() {
     let cleaned = this.removeCommentsFromHTML(this.previewContent.nativeElement.outerHTML);
     return cleaned;
@@ -62,7 +61,7 @@ export class PreviewComponent {
 
       let group: any;
 
-      if (this.controlName === 'checkbox' || this.controlName === 'radio' || this.controlName === 'textbox'
+      if (this.controlName === 'checkbox' || this.controlName === 'radio' || this.controlName === 'input'
         || this.controlName === 'selectbox') {
         group = this.fb.group({
           [element.formControlName]: [element.value]
@@ -84,53 +83,29 @@ export class PreviewComponent {
     const formElements = document.forms[0].elements;
     const formData: any = {};
 
-    for (let i = 0; i < formElements.length; i++) {
-      const element = formElements[i];
+    for (const key in formElements) {
+      const element = formElements[key];
       if (element instanceof HTMLInputElement) {
-        if (element.type === 'text' || element.type === 'number' || element.type === 'date') {
-          const classList = element.classList;
-
-          classList.forEach(className => {
-            if (className.startsWith('ng-')) {
-              classList.remove(className);
-            }
-          });
-
-          let stringClassList = classList[0];
-
-          formData[stringClassList] = (element as HTMLInputElement).value;
-
-        } else if (element.type === 'checkbox' || element.type === 'radio') {
-          const classList = element.classList;
-
-          classList.forEach(className => {
-            if (className.startsWith('ng-')) {
-              classList.remove(className);
-            }
-          });
-
-          let stringClassList = classList[0];
-
-          formData[stringClassList] = (element as HTMLInputElement).checked;
-
+        if (element.type === 'text' || element.type === 'number' || element.type === 'password') {
+          formData[element.name] = element.value;
         }
-      } else if (element instanceof HTMLSelectElement) {
-        const classList = element.classList;
-
-        classList.forEach(className => {
-          if (className.startsWith('ng-')) {
-            classList.remove(className);
+        else if (element.type === 'checkbox') {
+          formData[element.name] = element.checked;
+        }
+        else if (element.type === 'radio') {
+          if (element.checked) {
+            formData[element.name] = element.value;
           }
-        });
-        let stringClassList = classList[0];
-
-        formData[stringClassList] = (element as HTMLSelectElement).value;
-
+        }
+      }
+      else if (element instanceof HTMLSelectElement) {
+        formData[element.name] = element.value;
       }
     }
+    console.log(formData);
     if (this.method === 'post') {
       this.http.postApi(this.endpoint_url, formData).subscribe(res => console.log(res));
-    } else {
+    } else if (this.method == 'get') {
       this.http.getApi(this.endpoint_url, formData).subscribe(res => console.log(res));
     }
   }

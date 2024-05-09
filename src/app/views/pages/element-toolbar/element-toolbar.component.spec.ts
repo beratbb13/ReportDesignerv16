@@ -10,8 +10,8 @@ describe('ElementToolbarComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ElementToolbarComponent]
     })
-    .compileComponents();
-    
+      .compileComponents();
+
     fixture = TestBed.createComponent(ElementToolbarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

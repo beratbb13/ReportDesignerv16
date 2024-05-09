@@ -1,19 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { file } from '../../entities/customElements';
-import { FolderService } from '../folder/folder.service';
-import { htmlElements } from '../../entities/htmlElements';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ElementService {
-
-  private folderService!: FolderService;
-
-  setFolderService(service2: FolderService) {
-    this.folderService = service2;
-  }
 
   elements: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
   changedElements: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
@@ -33,7 +24,7 @@ export class ElementService {
     const uuid = this.generateUUID();
     element['id'] = uuid;
 
-    if (element.name == 'Textbox') {
+    if (element.name == 'Input') {
       element['style'] = {
         width: 150,
         height: 30,

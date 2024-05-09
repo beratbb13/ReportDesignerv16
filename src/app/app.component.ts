@@ -4,34 +4,34 @@ import { ElementToolbarComponent } from './views/pages/element-toolbar/element-t
 import { TopBarComponent } from './views/pages/top-bar/top-bar.component';
 import { MainEditorComponent } from './views/pages/main-editor/main-editor.component';
 import { PropertiesComponent } from './views/pages/properties/properties.component';
-import { FolderComponent } from './views/pages/folder/folder.component';
 import { PreviewComponent } from './views/pages/preview/preview.component';
 import { ElementService } from './services/element/element.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { FolderService } from './services/folder/folder.service';
+import { concatMap, of, tap } from 'rxjs';
+import { file } from './entities/customElements';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, FormsModule, ReactiveFormsModule, PreviewComponent, ElementToolbarComponent, TopBarComponent, MainEditorComponent, PropertiesComponent, FolderComponent, MatButtonModule],
+  imports: [RouterOutlet, CommonModule, FormsModule, ReactiveFormsModule, PreviewComponent, ElementToolbarComponent, TopBarComponent, MainEditorComponent, PropertiesComponent, MatButtonModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent {
+
+  @ViewChild(MainEditorComponent) mainEditorComponent!: MainEditorComponent;
+  @ViewChild(PreviewComponent) previewComponent!: PreviewComponent;
+  @ViewChild(TopBarComponent) topBarComponent!: TopBarComponent;
+  previewMode: boolean = false;
 
   onExport() {
     let result = this.previewComponent.returnInnerHTML();
     console.log(result);
   }
 
-  previewMode: boolean = false;
-
-  @ViewChild(MainEditorComponent) mainEditorComponent!: MainEditorComponent;
-  @ViewChild(PreviewComponent) previewComponent!: PreviewComponent;
-
-  @ViewChild(TopBarComponent) topBarComponent!: TopBarComponent;
   constructor(private elementService: ElementService, private folderService: FolderService) {
     this.elementService.previewMode.asObservable().subscribe(res => {
       this.previewMode = res;
@@ -41,6 +41,11 @@ export class AppComponent {
           let elements = this.elementService.changedElements.getValue();
           file.content = JSON.stringify(elements);
           this.folderService.selectedFile.next(file);
+          if (elements.length === 0) {
+            this.topBarComponent.exportDisabled = true;
+          } else {
+            this.topBarComponent.exportDisabled = false;
+          }
         }
       }
     });
@@ -50,17 +55,14 @@ export class AppComponent {
         this.elementService.previewMode.next(true);
         setTimeout(() => {
           this.onExport();
-        }, 1000);
+        }, 500);
       }
     });
 
   }
 
   ngOnInit() {
-
-    //this.getSavedTemplate();
     this.getFolders();
-    //this.getSelectedFile();
 
     this.folderService.selectedFile.asObservable().subscribe(res => {
       if (res) {
@@ -69,9 +71,6 @@ export class AppComponent {
         if (selectedId !== res.fileId) {
           this.mainEditorComponent.fileId = res.fileId;
           if (res?.content != null) {
-
-            this.topBarComponent.exportDisabled = false;
-
             let contentWidth = this.mainEditorComponent.content.nativeElement.clientWidth;
             let contentHeight = this.mainEditorComponent.content.nativeElement.clientHeight;
             let contentX = this.mainEditorComponent.content.nativeElement.offsetLeft;
@@ -84,8 +83,8 @@ export class AppComponent {
               element.style.width = changedWidth;
               element.style.height = changedHeight;
 
-              let changedX = contentX * element.positionRelative.x;//contentX + ((element.positionRelative.x) * contentX / 100);
-              let changedY = contentY * element.positionRelative.y;//contentY + ((element.positionRelative.y) * contentY / 100);
+              let changedX = contentX * element.positionRelative.x; //contentX + ((element.positionRelative.x) * contentX / 100);
+              let changedY = contentY * element.positionRelative.y; //contentY + ((element.positionRelative.y) * contentY / 100);
 
               element.position = {
                 x: changedX,
@@ -95,6 +94,9 @@ export class AppComponent {
             });
 
             this.elementService.changedElements.next(JSON.parse(res.content));
+
+            if (JSON.parse(res.content).length > 0)
+              this.topBarComponent.exportDisabled = false;
           } else {
             this.elementService.changedElements.next([]);
           }
@@ -103,19 +105,30 @@ export class AppComponent {
       }
     });
   }
-
-
-  getSelectedFile() {
-
-  }
+  savedTemplate: file | null = null;
 
   getFolders() {
-    this.folderService.getFoldersByuserName('beratbb13').subscribe(res => {
-      if (res.result == true && res.message) {
-        let response = res.message;
+    this.folderService.getExportedTemplateByUsername('beratbb13').pipe(
+      tap(res => {
+        if (res.result == true && res.message && res.message.length) {
+          let response = res.message[0] as file;
+          this.savedTemplate = response;
+          this.folderService.selectedFile.next(response);
+          return of(true);
+        } else {
+          return of(false);
+        }
+      })
+    ).subscribe(res => {
+      if (!res) {
+        this.folderService.getFoldersByuserName('beratbb13').subscribe(res => {
+          if (res.result == true && res.message) {
+            let response = res.message;
 
-        const tree = this.buildTree(response);
-        this.folderService.folders.next(tree);
+            const tree = this.buildTree(response);
+            this.folderService.folders.next(tree);
+          }
+        });
       }
     });
   }
@@ -152,20 +165,8 @@ export class AppComponent {
     return rootFolders[0];
   }
 
-  getSavedTemplate() {
-    /*this.folderService.getTemplateByuserName('beratbb13').subscribe(res => {
-      if (res.result == true && res.message) {
-        if (res.message.length) {
-          let response = res.message[0];
-          this.folderService.selectedFile.next({ fileId: response.id, name: response.name, content: response.content, isSelected: false })
-        }
-      }
-    });*/
-  }
-
   goBackEdit() {
     this.elementService.previewMode.next(false);
     this.folderService.save.next(false);
   }
-
 }

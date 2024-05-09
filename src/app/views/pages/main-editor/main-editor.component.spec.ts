@@ -10,8 +10,8 @@ describe('MainEditorComponent', () => {
     await TestBed.configureTestingModule({
       imports: [MainEditorComponent]
     })
-    .compileComponents();
-    
+      .compileComponents();
+
     fixture = TestBed.createComponent(MainEditorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

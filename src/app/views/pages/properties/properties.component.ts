@@ -7,10 +7,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 
-interface ApiResponse {
-  [key: string]: any;
-}
-
 @Component({
   selector: 'app-properties',
   standalone: true,
@@ -19,11 +15,15 @@ interface ApiResponse {
   styleUrl: './properties.component.css'
 })
 export class PropertiesComponent {
+  @ViewChild('panel') panel!: ElementRef;
+  isOpened: boolean = false;
   propertyForm!: FormGroup;
   selectedElement: any = null;
   isNum: boolean = false;
   changedSrc: string = '';
-
+  controlName: string = '';
+  form_Control: string = '';
+  endPoint: string = '';
   attributeTypes = {
     id: 'text',
     name: 'text',
@@ -104,10 +104,6 @@ export class PropertiesComponent {
     loading: 'select',
     decoding: 'select'
   };
-
-  controlName: string = '';
-  form_Control: string = '';
-  endPoint: string = '';
 
   ngOnInit() {
     if (window.location.href)
@@ -383,7 +379,7 @@ export class PropertiesComponent {
 
       this.selectedElement['style'] = stylesObject;
 
-      if (this.controlName === 'checkbox' || this.controlName === 'radio' || this.controlName === 'textbox' || this.controlName === 'selectbox') {
+      if (this.controlName === 'checkbox' || this.controlName === 'radio' || this.controlName === 'input' || this.controlName === 'selectbox') {
         this.selectedElement['formControlName'] = this.form_Control;
       }
 
@@ -406,9 +402,6 @@ export class PropertiesComponent {
   getFormControlValue(formGroup: AbstractControl): FormControl {
     return formGroup.get(Object.keys(formGroup.value)[0]) as FormControl;
   }
-
-  @ViewChild('panel') panel!: ElementRef;
-  isOpened: boolean = false;
 
   onToggle() {
     if (this.panel) {

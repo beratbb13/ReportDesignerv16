@@ -56,9 +56,9 @@ a.wrimagecard:hover,
 }
 
 .wrimagecard-topimage_title {
-    padding: 20px 24px;
-    height: 80px;
-    padding-bottom: 0.75rem;
+    padding: 0px 8px;
+    height: 65px;
+    /*padding-bottom: 0.75rem;*/
     position: relative;
 }
 

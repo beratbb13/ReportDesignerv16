@@ -1,31 +1,67 @@
-<div class="container-fluid" style="max-width: 98vw;"> <!--input-icon uil uil-lock-alt-->
+<div
+  class="container-fluid"
+  style="max-width: 98vw"
+  *ngIf="savedTemplate === null"
+>
   <div class="row d-flex justify-content-center" *ngIf="previewMode === false">
-    <div class="col-lg-3 col-md-2 col-xs-12" style="padding-left: 1px !important; 
-    padding-right: 0px !important;">
+    <div
+      class="col-lg-3 col-md-2 col-xs-12"
+      style="padding-left: 1px !important; padding-right: 0px !important"
+    >
       <app-element-toolbar></app-element-toolbar>
     </div>
-    <div class="col-lg-7 col-md-8 col-xs-9" style="padding-left: 0px !important;
-    padding-right: 1px !important;">
+    <div
+      class="col-lg-7 col-md-8 col-xs-9"
+      style="padding-left: 0px !important; padding-right: 1px !important"
+    >
       <app-top-bar></app-top-bar>
-      <div class="row" style="padding-top: 3px; padding-left: 0px !important; padding-right: 0px !important;">
+      <div
+        class="row"
+        style="
+          padding-top: 3px;
+          padding-left: 0px !important;
+          padding-right: 0px !important;
+        "
+      >
         <app-main-editor></app-main-editor>
       </div>
     </div>
-    <div class="col-lg-2 col-md-2 col-xs-3" style="padding-left: 0px !important; padding-right: 0px !important;">
+    <div
+      class="col-lg-2 col-md-2 col-xs-3"
+      style="padding-left: 0px !important; padding-right: 0px !important"
+    >
       <div class="row">
         <app-properties></app-properties>
       </div>
     </div>
   </div>
-  <div class="row d-flex justify-content-center mb-3" *ngIf="previewMode === true">
+  <div
+    class="row d-flex justify-content-center mb-3"
+    *ngIf="previewMode === true"
+  >
     <div class="col-8">
-      <nav class="navbar navbar-light bg-light p-2" style="background-color:rgba(187, 120, 36, 0.1) !important;">
+      <nav
+        class="navbar navbar-light bg-light p-2"
+        style="background-color: rgba(187, 120, 36, 0.1) !important"
+      >
         <button mat-button (click)="goBackEdit()">Back to Edit</button>
       </nav>
     </div>
   </div>
   <div class="row d-flex justify-content-center" *ngIf="previewMode === true">
     <div class="col-8 justify-content-center">
+      <app-preview></app-preview>
+    </div>
+  </div>
+</div>
+
+<div
+  class="container-fluid"
+  style="max-width: 98vw"
+  *ngIf="savedTemplate !== null"
+>
+  <div class="row d-flex justify-content-center">
+    <div class="col justify-content-center">
       <app-preview></app-preview>
     </div>
   </div>

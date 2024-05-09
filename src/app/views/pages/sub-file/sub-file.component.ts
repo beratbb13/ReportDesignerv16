@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
 import { file, folder } from '../../../entities/customElements';
-import { FolderComponent } from '../folder/folder.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FolderService } from '../../../services/folder/folder.service';
@@ -9,7 +8,7 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 @Component({
   selector: 'app-sub-file',
   standalone: true,
-  imports: [FolderComponent, ReactiveFormsModule, FormsModule, CommonModule],
+  imports: [ReactiveFormsModule, FormsModule, CommonModule],
   templateUrl: './sub-file.component.html',
   styleUrl: './sub-file.component.css'
 })
@@ -24,7 +23,6 @@ export class SubFileComponent {
   @Input() toggle: boolean = false;
   @Input() showFiles: boolean = false;
   @Input() tempSelectedFolder: string | undefined = undefined;
-
   public count: number = 0;
 
   ngOnChanges() {

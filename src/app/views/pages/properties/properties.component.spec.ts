@@ -10,8 +10,8 @@ describe('PropertiesComponent', () => {
     await TestBed.configureTestingModule({
       imports: [PropertiesComponent]
     })
-    .compileComponents();
-    
+      .compileComponents();
+
     fixture = TestBed.createComponent(PropertiesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

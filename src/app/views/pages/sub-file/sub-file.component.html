@@ -1,21 +1,40 @@
-<div style="margin-bottom: 3px; padding: 12px 0px; display: flex; align-items: center;"
-    [ngStyle]="{ 'background-color': tempSelectedFolder === folder.folderName ? 'rgba(187, 120, 36, 0.1)' : '' }"
-    [style.padding-left.px]="paddingLeft * count" (dblclick)="!showFiles ? chooseFolder(folder) : chooseFolder(null)"
-    (click)="selectFolder()">
-    <img src="assets/folder.png" width="20" height="20">&nbsp; <span style="font-size: 22px; font-weight: 400;">{{
-        folder.folderName}}</span>
+<div
+  style="
+    margin-bottom: 3px;
+    padding: 12px 0px;
+    display: flex;
+    align-items: center;
+  "
+  [ngStyle]="{
+    'background-color':
+      tempSelectedFolder === folder.folderName ? 'rgba(187, 120, 36, 0.1)' : ''
+  }"
+  [style.padding-left.px]="paddingLeft * count"
+  (dblclick)="!showFiles ? chooseFolder(folder) : chooseFolder(null)"
+  (click)="selectFolder()"
+>
+  <img src="assets/folder.png" width="20" height="20" />&nbsp;
+  <span style="font-size: 22px; font-weight: 400">{{ folder.folderName }}</span>
 </div>
 <div *ngIf="showFiles">
-    @for(file of folder.files; track file){
-    <div class="file" [style.padding-left.px]="paddingLeft * count" (dblclick)="selected(file)"
-        style="margin-bottom: 3px; padding: 12px 0px;">
-        <!--(click)="selectFile(file)"-->
-        <img src="assets/file.png" width="20" height="20">&nbsp; <span style="font-size: 22px; font-weight: 400;">{{
-            file.name}}</span>
-    </div>
-    }
+  @for(file of folder.files; track file){
+  <div
+    class="file"
+    [style.padding-left.px]="paddingLeft * count"
+    (dblclick)="selected(file)"
+    style="margin-bottom: 3px; padding: 12px 0px"
+  >
+    <!--(click)="selectFile(file)"-->
+    <img src="assets/file.png" width="20" height="20" />&nbsp;
+    <span style="font-size: 22px; font-weight: 400">{{ file.name }}</span>
+  </div>
+  }
 </div>
 @for(folder of folder.folders; track folder;){
-<app-sub-file [folder]="folder" [toggle]="toggle"
-    [paddingLeft]="(folder.pid) ? paddingLeft + (folder.pid + 1): paddingLeft" [showFiles]="showFiles"></app-sub-file>
+<app-sub-file
+  [folder]="folder"
+  [toggle]="toggle"
+  [paddingLeft]="folder.pid ? paddingLeft + (folder.pid + 1) : paddingLeft"
+  [showFiles]="showFiles"
+></app-sub-file>
 }

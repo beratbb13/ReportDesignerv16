@@ -8,7 +8,7 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { ElementService } from '../../../services/element/element.service';
-import { concatMap, map, of } from 'rxjs';
+import { concatMap, of } from 'rxjs';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -31,13 +31,30 @@ export class TopBarComponent {
   @ViewChild('previewModal') previewModal!: ElementRef;
   @ViewChild('exportModal') exportModal!: ElementRef;
   @ViewChild(SubFileComponent) subFileComponent!: SubFileComponent;
-
   folders: folder[] = [];
   toggle: boolean = false;
   selectedFolder: folder = { id: -1, folderName: '', files: [], folders: [] }
   selectedFile: any = {};
   showFileCreator: boolean = false;
   newFileName: string = '';
+  isNew: boolean = false;
+  modalHeader: string = '';
+  previewForm!: FormGroup;
+  exportForm!: FormGroup;
+  exportDisabled: boolean = true;
+  enteredFolderName: string = '';
+  isShouldBeCreated: boolean = false;
+  foundedFolderIndex: number = -1;
+  foundedFileIndex: number = -1;
+  message: any = { id: 0, text: '' };
+  isDropdownOpen = false;
+  selectedFileId: number | null = null;
+  paddingLeftStart: number = 2;
+  buttonInnerHtml: any = {
+    id: 0,
+    text: 'Add new folder',
+    inActive: false
+  }
 
   constructor(private httpService: HttpService, private folderService: FolderService, private dialogService: DialogService, private elementService: ElementService, private fb: FormBuilder) {
     this.folderService.folders.asObservable().subscribe(res => {
@@ -61,41 +78,9 @@ export class TopBarComponent {
       }
     });
 
-    /*this.folderService.selectedFile.asObservable().subscribe(res => {
-      if (res) {
-        this.selectedFile = res;
-      }
-    });*/
-
     this.selectedFileId = this.folderService.selectedFileId.getValue();
     this.selectedFile = this.folderService.selectedFile.getValue();
   }
-
-  isNew: boolean = false;
-  modalHeader: string = '';
-  previewForm!: FormGroup;
-  exportForm!: FormGroup;
-  exportDisabled: boolean = true;
-
-  exportParams: any[] = [
-    { formControlName: "name", isRequired: true },
-    { formControlName: "appCode", isRequired: true },
-    { formControlName: "icon", isRequired: false },
-    { formControlName: "applicationStatus", isRequired: false },
-    { formControlName: "description", isRequired: false },
-    { formControlName: "access", isRequired: false },
-    { formControlName: "applicationId", isRequired: false },
-    { formControlName: "domain", isRequired: false },
-    { formControlName: "owner", isRequired: false },
-    { formControlName: "ownerId", isRequired: false },
-    { formControlName: "groups", isRequired: false },
-    { formControlName: "openerMethod", isRequired: false },
-    { formControlName: "applicationLink", isRequired: false },
-    { formControlName: "dashboards", isRequired: false },
-    { formControlName: "appType", isRequired: false },
-    { formControlName: "creationDate", isRequired: false },
-    { formControlName: "appCSS", isRequired: false },
-  ]
 
   ngOnInit() {
     this.previewForm = this.fb.group({
@@ -106,49 +91,25 @@ export class TopBarComponent {
       "name": ['', Validators.required],
       "appCode": ['', Validators.required],
       "icon": ['',],
-      "applicationStatus": ['', Validators.required],
+      "applicationStatus": ['1', Validators.required],
       "description": ['',],
-      "access": ['', Validators.required],
+      "access": ['1', Validators.required],
       "applicationId": ['',],
       "domain": ['',],
       "owner": ['beratbb13',],
       "ownerId": ['',],
       "groups": [[],],
-      "openerMethod": ['', Validators.required],
+      "openerMethod": ['3', Validators.required],
       "applicationLink": ['',],
       "dashboards": [[],],
-      "appType": ['', Validators.required],
+      "appType": ['1', Validators.required],
       "creationDate": ['',],
       "appCSS": ['',],
-      //parameters: this.fb.array([])
     });
-
-    //this.setExportParams();
-  }
-
-  get parameters(): FormArray {
-    return this.exportForm.get('parameters') as FormArray;
   }
 
   get prevcontrols(): FormArray {
     return this.previewForm.get('prevcontrols') as FormArray;
-  }
-
-  setExportParams() {
-    this.exportParams.forEach(param => {
-      const { formControlName, isRequired } = param;
-      let group: any;
-      if (isRequired) {
-        group = this.fb.group({
-          [formControlName]: ['', Validators.required]
-        });
-      } else {
-        group = this.fb.group({
-          [formControlName]: ['']
-        });
-      }
-      this.parameters.push(group);
-    });
   }
 
   closeExportModal() {
@@ -164,13 +125,6 @@ export class TopBarComponent {
     }
     this.isNew = boolean;
     this.modal.nativeElement.style.display = 'block';
-  }
-
-  enteredFolderName: string = '';
-  buttonInnerHtml: any = {
-    id: 0,
-    text: 'Add new folder',
-    inActive: false
   }
 
   enteredFolderNameChanged() {
@@ -215,8 +169,6 @@ export class TopBarComponent {
     }
 
   }
-
-  isShouldBeCreated: boolean = false;
 
   checkNewFileName() {
 
@@ -277,8 +229,6 @@ export class TopBarComponent {
     }
   }
 
-  paddingLeftStart: number = 2;
-
   collapse(folder: folder) {
     let folderElements = document.getElementsByClassName(folder.folderName);
 
@@ -292,8 +242,6 @@ export class TopBarComponent {
       }
     }
   }
-
-  selectedFileId: number | null = null;
 
   toggleSelection(file: file) {
     file.isSelected = !file.isSelected;
@@ -315,8 +263,6 @@ export class TopBarComponent {
     }
   }
 
-  isDropdownOpen = false;
-
   onToggle(): void {
     this.isDropdownOpen = !this.isDropdownOpen;
 
@@ -327,14 +273,17 @@ export class TopBarComponent {
 
   saveChanges() {
     let elements = this.elementService.changedElements.getValue();
+    let file: file | null = this.folderService.selectedFile.getValue();
+    let fileId = this.folderService.selectedFileId.getValue();
+
     let content = this.folderService.content.getValue();
 
     elements.forEach(element => {
       let childLeft = element.position.x - content.x;
       let childTop = element.position.y - content.y;
 
-      let childPercentageX = element.position.x / content.x;//(childLeft / content.width) * 100;
-      let childPercentageY = element.position.y / content.y;//(childTop / content.height) * 100;
+      let childPercentageX = (((element.position.x - content.x) / content.width));//(childLeft / content.width) * 100;
+      let childPercentageY = (((element.position.y - content.y) / content.height));//(childTop / content.height) * 100;
 
       element.styleRelative = {
         width: (element.style.width / content.width),
@@ -347,8 +296,6 @@ export class TopBarComponent {
       };
     });
 
-    let file: file | null = this.folderService.selectedFile.getValue();
-    let fileId = this.folderService.selectedFileId.getValue();
     let stringify: string = ''
     if (elements.length)
       stringify = JSON.stringify(elements);
@@ -356,43 +303,29 @@ export class TopBarComponent {
       file.content = stringify;
       this.folderService.saveTemplate({ content: stringify, id: fileId }, 'beratbb13')
         .subscribe(res => {
-          //if (res.result == true && res.message == 'Success') {
-          /*let mainFolder = this.folderService.folders.getValue();
-          if (file !== null) {
-            let foundedStat = this.updateFile(mainFolder, file);
-            debugger
-            if (foundedStat) {
-              if (this.foundedFolderIndex === 0) {
-                mainFolder.files[this.foundedFileIndex] = file;
-                this.folderService.folders.next(mainFolder);
-              } else {
-                mainFolder.folders[this.foundedFolderIndex].files[this.foundedFileIndex] = file;
-                this.folderService.folders.next(mainFolder);
+          if (res.result == true && res.message == 'Success') {
+            let mainFolder = this.folderService.folders.getValue();
+            if (file !== null) {
+              let foundedStat = this.updateFile(mainFolder, file);
+              if (foundedStat) {
+                if (this.foundedFolderIndex === 0) {
+                  mainFolder.files[this.foundedFileIndex] = file;
+                  this.folderService.folders.next(mainFolder);
+                } else {
+                  mainFolder.folders[this.foundedFolderIndex].files[this.foundedFileIndex] = file;
+                  this.folderService.folders.next(mainFolder);
+                }
+              } else if (!foundedStat) {
+                console.log('dosya bulunamadı');
               }
-            } else if (!foundedStat) {
-              console.log('dosya bulunamadı');
+
+              this.foundedFolderIndex = -1;
+              this.foundedFileIndex = -1;
             }
- 
-            this.foundedFolderIndex = -1;
-            this.foundedFileIndex = -1;
-          }*/
-
-          //üstteki kısmı calısır duruma getir
-
-          this.folderService.getFoldersByuserName('beratbb13').subscribe(res => {
-            if (res.result == true && res.message) {
-              let response = res.message;
-
-              const tree = this.buildTree(response);
-              this.folderService.folders.next(tree);
-            }
-          })
-          //}
+          }
         });
     }
   }
-
-
 
   buildTree(files: any[]) {
     const rootFolders: any[] = [];
@@ -433,6 +366,7 @@ export class TopBarComponent {
   exportTemplate() {
     let file = this.folderService.selectedFile.getValue();
     if (file != null) {
+      debugger
       if (this.exportForm.valid) {
         if (file != null) {
           let fileId = file.fileId;
@@ -483,8 +417,6 @@ export class TopBarComponent {
     return control ? control.value.value : null;
   }
 
-  message: any = { id: 0, text: '' };
-
   checkTempSelectedFolder() {
     if (this.buttonInnerHtml.id === 0) {
       this.buttonInnerHtml.inActive = false;
@@ -514,9 +446,6 @@ export class TopBarComponent {
         });
     }
   }
-
-  foundedFolderIndex: number = -1;
-  foundedFileIndex: number = -1;
 
   updateFile(folder: folder, file: file | null) {
     if (file === null)

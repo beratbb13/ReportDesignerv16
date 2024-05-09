@@ -1,157 +1,366 @@
-<nav class="navbar navbar-light bg-light p-2" style="background-color:rgba(187, 120, 36, 0.1) !important;">
+<nav
+  class="navbar navbar-light bg-light p-2"
+  style="background-color: rgba(187, 120, 36, 0.1) !important"
+>
   <button mat-button [matMenuTriggerFor]="menu">File</button>
   <mat-menu #menu="matMenu">
     <button mat-menu-item (click)="openModal(true)">New</button>
     <button mat-menu-item (click)="openModal(false)">Open</button>
   </mat-menu>
   <button mat-button (click)="showOnPreview()">Preview</button>
-  <button mat-button (click)="openExportTemplate()" [disabled]="exportDisabled">Export</button>
+  <button mat-button (click)="openExportTemplate()" [disabled]="exportDisabled">
+    Export
+  </button>
   <button mat-button (click)="saveChanges()">Save</button>
 </nav>
 
-<div class="modal" tabindex="-1" role="dialog" #modal
-  style="margin-top: 5vh; display: none; justify-content: center; align-items: center; max-height: 70vh;">
-  <div class="modal-dialog" role="document" style="width: 100%;">
-    <div class="modal-content" style="width: 100%;">
-      <div class="modal-header" style="width: 100%;">
-        <h5 class="modal-title" style="font-size: 20px; display: flex; align-items: center;">
-          {{ modalHeader }}</h5>
-        <button type="button" style="border-color: rgba(187, 120, 36, 0.1) !important; background-color: rgba(187, 120, 36, 0.1) !important; padding: 6px 12px !important;
-        color: black !important;" data-dismiss="modal" aria-label="Close" (click)="closeModal()">
+<div
+  class="modal"
+  tabindex="-1"
+  role="dialog"
+  #modal
+  style="
+    margin-top: 5vh;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    max-height: 70vh;
+  "
+>
+  <div class="modal-dialog" role="document" style="width: 100%">
+    <div class="modal-content" style="width: 100%">
+      <div class="modal-header" style="width: 100%">
+        <h5
+          class="modal-title"
+          style="font-size: 20px; display: flex; align-items: center"
+        >
+          {{ modalHeader }}
+        </h5>
+        <button
+          type="button"
+          style="
+            border-color: rgba(187, 120, 36, 0.1) !important;
+            background-color: rgba(187, 120, 36, 0.1) !important;
+            padding: 6px 12px !important;
+            color: black !important;
+          "
+          data-dismiss="modal"
+          aria-label="Close"
+          (click)="closeModal()"
+        >
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body" style="width: 100%; height: calc(100% - 56px); overflow-y: auto;" *ngIf="folders.length">
-        <app-sub-file [folder]="folders[0]" [paddingLeft]="paddingLeftStart" [toggle]="toggle" [showFiles]="!isNew"
-          [tempSelectedFolder]="undefined"></app-sub-file>
+      <div
+        class="modal-body"
+        style="width: 100%; height: calc(100% - 56px); overflow-y: auto"
+        *ngIf="folders.length"
+      >
+        <app-sub-file
+          [folder]="folders[0]"
+          [paddingLeft]="paddingLeftStart"
+          [toggle]="toggle"
+          [showFiles]="!isNew"
+          [tempSelectedFolder]="undefined"
+        ></app-sub-file>
       </div>
-      <div class="modal-footer d-flex justify-content-between align-items-center">
+      <div
+        class="modal-footer d-flex justify-content-between align-items-center"
+      >
         <span *ngIf="message.id === 0 && message.text.length === 0"></span>
-        <span *ngIf="message.id === 0 && message.text.length !== 0">{{ message.text }}</span>
+        <span *ngIf="message.id === 0 && message.text.length !== 0">{{
+          message.text
+        }}</span>
         <span *ngIf="message.id === 1">
-          <input [(ngModel)]="enteredFolderName" (ngModelChange)="enteredFolderNameChanged()" type="text"
-            class="form-control" placeholder="enter a folder name">
+          <input
+            [(ngModel)]="enteredFolderName"
+            (ngModelChange)="enteredFolderNameChanged()"
+            type="text"
+            class="form-control"
+            placeholder="enter a folder name"
+          />
         </span>
         <button
-          style="border-color: rgba(187, 120, 36, 0.1) !important; background-color: rgba(187, 120, 36, 0.1) !important; padding: 6px 12px !important;"
-          (click)="checkTempSelectedFolder()" [disabled]="buttonInnerHtml.inActive === true"
-          [ngStyle]="{ 'background-color': buttonInnerHtml.inActive === true ? 'red' : '' }">{{
-          buttonInnerHtml.text }}
+          style="
+            border-color: rgba(187, 120, 36, 0.1) !important;
+            background-color: rgba(187, 120, 36, 0.1) !important;
+            padding: 6px 12px !important;
+          "
+          (click)="checkTempSelectedFolder()"
+          [disabled]="buttonInnerHtml.inActive === true"
+          [ngStyle]="{
+            'background-color': buttonInnerHtml.inActive === true ? 'red' : ''
+          }"
+        >
+          {{ buttonInnerHtml.text }}
         </button>
       </div>
     </div>
   </div>
 </div>
 
-<div class="modal" tabindex="-1" role="dialog" #modal_second
-  style="display: none; justify-content: center; align-items: center; max-height: 70vh;">
-  <div class="modal-dialog" role="document" style="width: 100%;">
-    <div class="modal-content" style="width: 100%;">
-      <div class="modal-header d-flex justify-content-between" style="width: 100%;">
-        <h5 class="modal-title" style="font-size: 20px; display: flex; align-items: center;">
-          Create a new file</h5>
-        <button type="button" class="btn btn-primary" style="background-color: rgba(187, 120, 36, 0.1) !important; border: 2px solid rgba(187, 120, 36, 0.1) !important;
-        color: black !important" data-dismiss="modal" aria-label="Close" (click)="closeModal()">
+<div
+  class="modal"
+  tabindex="-1"
+  role="dialog"
+  #modal_second
+  style="
+    display: none;
+    justify-content: center;
+    align-items: center;
+    max-height: 70vh;
+  "
+>
+  <div class="modal-dialog" role="document" style="width: 100%">
+    <div class="modal-content" style="width: 100%">
+      <div
+        class="modal-header d-flex justify-content-between"
+        style="width: 100%"
+      >
+        <h5
+          class="modal-title"
+          style="font-size: 20px; display: flex; align-items: center"
+        >
+          Create a new file
+        </h5>
+        <button
+          type="button"
+          class="btn btn-primary"
+          style="
+            background-color: rgba(187, 120, 36, 0.1) !important;
+            border: 2px solid rgba(187, 120, 36, 0.1) !important;
+            color: black !important;
+          "
+          data-dismiss="modal"
+          aria-label="Close"
+          (click)="closeModal()"
+        >
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body" style="width: 100%; height: calc(100% - 56px); overflow-y: auto;">
+      <div
+        class="modal-body"
+        style="width: 100%; height: calc(100% - 56px); overflow-y: auto"
+      >
         <div class="form-group mb-4">
           <label class="mb-1">Filename</label>
-          <input type="text" class="form-control" [(ngModel)]="newFileName" (ngModelChange)="checkNewFileName()">
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="newFileName"
+            (ngModelChange)="checkNewFileName()"
+          />
         </div>
         <div class="form-group d-flex justify-content-center">
-          <button type="submit" style="border-color: rgba(187, 120, 36, 0.1) !important; background-color: rgba(187, 120, 36, 0.1) !important; padding: 6px 12px !important;
-           color: black !important;" (click)="crateNewFile()" [disabled]="!isShouldBeCreated">Confirm</button>
+          <button
+            type="submit"
+            style="
+              border-color: rgba(187, 120, 36, 0.1) !important;
+              background-color: rgba(187, 120, 36, 0.1) !important;
+              padding: 6px 12px !important;
+              color: black !important;
+            "
+            (click)="crateNewFile()"
+            [disabled]="!isShouldBeCreated"
+          >
+            Confirm
+          </button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<div class="modal" tabindex="-1" role="dialog" #exportModal
-  style="display: none; justify-content: center; align-items: center; max-height: 90vh;">
-  <div class="modal-dialog" role="document" style="width: 100%;">
-    <div class="modal-content" style="width: 100%;">
-      <div class="modal-header d-flex justify-content-between" style="width: 100%;">
-        <h5 class="modal-title" style="font-size: 20px; display: flex; align-items: center;">
-          Export Form</h5>
-        <button type="button" style="border-color: rgba(187, 120, 36, 0.1) !important; background-color: rgba(187, 120, 36, 0.1) !important; padding: 6px 12px !important;
-        color: black !important;" data-dismiss="modal" aria-label="Close" (click)="closeExportModal()">
+<div
+  class="modal"
+  tabindex="100"
+  role="dialog"
+  #exportModal
+  style="
+    display: none;
+    justify-content: center;
+    align-items: center;
+    max-height: 90vh;
+  "
+>
+  <div class="modal-dialog" role="document" style="width: 100%">
+    <div class="modal-content" style="width: 100%">
+      <div
+        class="modal-header d-flex justify-content-between"
+        style="width: 100%"
+      >
+        <h5
+          class="modal-title"
+          style="font-size: 20px; display: flex; align-items: center"
+        >
+          Export Form
+        </h5>
+        <button
+          type="button"
+          style="
+            border-color: rgba(187, 120, 36, 0.1) !important;
+            background-color: rgba(187, 120, 36, 0.1) !important;
+            padding: 6px 12px !important;
+            color: black !important;
+          "
+          data-dismiss="modal"
+          aria-label="Close"
+          (click)="closeExportModal()"
+        >
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body" style="overflow: hidden;">
+      <div class="modal-body" style="overflow: hidden">
         <form [formGroup]="exportForm">
-          <!--@for (formGroup of parameters.controls; let i = $index; track formGroup){
-          <div class="form-group mb-1" style="padding-bottom: 5px;">
-            <label style="width: 100%; font-size: 15px;">deneme</label>
-            <input type="text" class="form-control" [formControl]="getFormControlValue(formGroup)"
-              style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;" />
+          <div class="form-group mb-1" style="padding-bottom: 5px">
+            <label style="width: 100%; font-size: 15px">App Code</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="appCode"
+              style="
+                border-radius: 20;
+                padding: 5px;
+                background-color: rgba(187, 120, 36, 0.1) !important;
+              "
+            />
           </div>
-          }-->
-          <div class="form-group mb-1" style="padding-bottom: 5px;">
-            <label style="width: 100%; font-size: 15px;">App Code</label>
-            <input type="text" class="form-control" formControlName="appCode"
-              style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;" />
+          <div class="form-group mb-1" style="padding-bottom: 5px">
+            <label style="width: 100%; font-size: 15px">Name</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="name"
+              style="
+                border-radius: 20;
+                padding: 5px;
+                background-color: rgba(187, 120, 36, 0.1) !important;
+              "
+            />
           </div>
-          <div class="form-group mb-1" style="padding-bottom: 5px;">
-            <label style="width: 100%; font-size: 15px;">Name</label>
-            <input type="text" class="form-control" formControlName="name"
-              style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;" />
+          <div class="form-group mb-1" style="padding-bottom: 5px">
+            <label style="width: 100%; font-size: 15px">Description</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="description"
+              style="
+                border-radius: 20;
+                padding: 5px;
+                background-color: rgba(187, 120, 36, 0.1) !important;
+              "
+            />
           </div>
-          <div class="form-group mb-1" style="padding-bottom: 5px;">
-            <label style="width: 100%; font-size: 15px;">Description</label>
-            <input type="text" class="form-control" formControlName="description"
-              style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;" />
+          <div class="form-group mb-1" style="padding-bottom: 5px">
+            <label style="width: 100%; font-size: 15px">Icon</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="icon"
+              style="
+                border-radius: 20;
+                padding: 5px;
+                background-color: rgba(187, 120, 36, 0.1) !important;
+              "
+            />
           </div>
-          <div class="form-group mb-1" style="padding-bottom: 5px;">
-            <label style="width: 100%; font-size: 15px;">Icon</label>
-            <input type="text" class="form-control" formControlName="icon"
-              style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;" />
-          </div>
-          <div class="form-group mb-1" style="padding-bottom: 5px;">
-            <label style="width: 100%; font-size: 15px;">Application Status</label>
-            <select class="form-control" formControlName="applicationStatus"
-              style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;">
-              <option style="padding: 10px;" value="1" selected>Active</option>
-              <option style="padding: 10px;" value="2">Passive</option>
+          <div class="form-group mb-1" style="padding-bottom: 5px">
+            <label style="width: 100%; font-size: 15px"
+              >Application Status</label
+            >
+            <select
+              class="form-control"
+              formControlName="applicationStatus"
+              style="
+                border-radius: 20;
+                padding: 5px;
+                background-color: rgba(187, 120, 36, 0.1) !important;
+              "
+            >
+              <option style="padding: 10px" value="1">Active</option>
+              <option style="padding: 10px" value="2">Passive</option>
             </select>
           </div>
-          <div class="form-group mb-1" style="padding-bottom: 5px;">
-            <label style="width: 100%; font-size: 15px;">Access</label>
-            <select class="form-control" formControlName="access"
-              style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;">
-              <option style="padding: 10px;" value="1" selected>Public</option>
-              <option style="padding: 10px;" value="2">Private</option>
-              <option style="padding: 10px;" value="3">Open</option>
+          <div class="form-group mb-1" style="padding-bottom: 5px">
+            <label style="width: 100%; font-size: 15px">Access</label>
+            <select
+              class="form-control"
+              formControlName="access"
+              style="
+                border-radius: 20;
+                padding: 5px;
+                background-color: rgba(187, 120, 36, 0.1) !important;
+              "
+            >
+              <option style="padding: 10px" value="1">Public</option>
+              <option style="padding: 10px" value="2">Private</option>
+              <option style="padding: 10px" value="3">Open</option>
             </select>
           </div>
-          <div class="form-group mb-1" style="padding-bottom: 5px;">
-            <label style="width: 100%; font-size: 15px;">App Opener Method</label>
-            <select class="form-control" formControlName="openerMethod"
-              style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;">
-              <option style="padding: 10px;" value="1">Bussion Internal</option>
-              <option style="padding: 10px;" value="2">New Tab</option>
-              <option style="padding: 10px;" value="3" selected>Pop up</option>
+          <div class="form-group mb-1" style="padding-bottom: 5px">
+            <label style="width: 100%; font-size: 15px"
+              >App Opener Method</label
+            >
+            <select
+              class="form-control"
+              formControlName="openerMethod"
+              style="
+                border-radius: 20;
+                padding: 5px;
+                background-color: rgba(187, 120, 36, 0.1) !important;
+              "
+            >
+              <option style="padding: 10px" value="1">Bussion Internal</option>
+              <option style="padding: 10px" value="2">New Tab</option>
+              <option style="padding: 10px" value="3">Pop up</option>
             </select>
           </div>
-          <div class="form-group mb-1" style="padding-bottom: 5px;">
-            <label style="width: 100%; font-size: 15px;">Primary App Color</label>
-            <input type="color" class="form-control" formControlName="appCSS"
-              style="border-radius: 20; padding: 5px; background-color: rgba(187, 120, 36, 0.1) !important;" />
+          <div class="form-group mb-1" style="padding-bottom: 5px">
+            <label style="width: 100%; font-size: 15px"
+              >Primary App Color</label
+            >
+            <input
+              type="color"
+              class="form-control"
+              formControlName="appCSS"
+              style="
+                border-radius: 20;
+                padding: 5px;
+                background-color: rgba(187, 120, 36, 0.1) !important;
+              "
+            />
           </div>
-          <div class="form-group mb-1" style="padding-bottom: 5px;">
-            <label style="width: 100%; font-size: 15px;">App Type</label>
-            <select class="form-control" formControlName="appType"
-              style="border-radius: 20; background-color: rgba(187, 120, 36, 0.1) !important;">
-              <option style="padding: 10px;" value="0">Data App</option>
-              <option style="padding: 10px;" value="1">Form App</option>
+          <div class="form-group mb-1" style="padding-bottom: 5px">
+            <label style="width: 100%; font-size: 15px">App Type</label>
+            <select
+              class="form-control"
+              formControlName="appType"
+              style="
+                border-radius: 20;
+                background-color: rgba(187, 120, 36, 0.1) !important;
+              "
+            >
+              <option style="padding: 10px" value="1">Form App</option>
             </select>
           </div>
-          <div class="form-group mb-2 d-flex justify-content-end" style=" padding-bottom: 5px;">
-            <button type="submit" style="padding: 5px 5px; border-color: rgba(187, 120, 36, 0.1) !important; background-color: rgba(187, 120, 36, 0.1) !important; padding: 6px 12px !important;
-            color: black !important;" (click)="exportTemplate()" [disabled]="!exportForm.valid">Create</button>
+          <div
+            class="form-group mb-2 d-flex justify-content-end"
+            style="padding-bottom: 5px"
+          >
+            <button
+              type="submit"
+              style="
+                padding: 5px 5px;
+                border-color: rgba(187, 120, 36, 0.1) !important;
+                background-color: rgba(187, 120, 36, 0.1) !important;
+                padding: 6px 12px !important;
+                color: black !important;
+              "
+              (click)="exportTemplate()"
+              [disabled]="!exportForm.valid"
+            >
+              Create
+            </button>
           </div>
         </form>
       </div>

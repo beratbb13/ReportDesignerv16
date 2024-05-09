@@ -16,7 +16,7 @@ import { MatDialogModule } from '@angular/material/dialog';
         MatDialogModule
     ],
     declarations: [
-        
+
     ],
     bootstrap: [],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]

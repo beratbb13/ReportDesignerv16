@@ -10,13 +10,9 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class FolderService {
-  constructor(private el: ElementService, private authService: AuthService, private http: HttpClient) {
-    this.elementService = el;
-    this.elementService.setFolderService(this);
-  }
+  constructor(private authService: AuthService, private http: HttpClient) { }
 
   token: string | null = this.authService.getToken();
-
   private elementService!: ElementService;
   content: BehaviorSubject<any> = new BehaviorSubject<any>({});
   count: BehaviorSubject<number> = new BehaviorSubject<number>(0);
@@ -120,7 +116,7 @@ export class FolderService {
     }
     return this.http.post(Endpoints.dataops, body).pipe(
       map((response: any) => {
-        return response.message;
+        return response;
       })
     );
   }
@@ -155,5 +151,18 @@ export class FolderService {
     );
   }
 
-
+  getExportedTemplateByUsername(username: string) {
+    const body = {
+      "Token": this.token,
+      "DataStoreId": Endpoints.formTemplatesDataStoreId,
+      "Operation": "read",
+      "Data": `select id, pid, name, cuser, isfile, content, applicationid from form_files where cuser like '${username}'`,
+      "Encrypted": "1951",
+    }
+    return this.http.post(Endpoints.dataops, body).pipe(
+      map((response: any) => {
+        return response;
+      })
+    );
+  }
 }

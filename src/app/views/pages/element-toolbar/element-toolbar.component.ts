@@ -30,91 +30,101 @@ export class ElementToolbarComponent {
   editorProperties: any = {};
   draggable: boolean = false;
   searchBar: string = '';
+  elements: any[] = [];
   filteredElements: any[] = [];
   addedElements: any[] = [];
-  elements: any[] =
-    [
-      {
-        name: 'Label',
-        tag: 'label',
-        icon: 'fa-solid fa-tag',// 'assets/label.png',
-        attributes: {
-          value: 'label',
-        }
-      },
-      {
-        name: 'Textbox',
-        tag: 'input',
-        icon: 'fa-solid fa-text-width',//'assets/textbox.png',
-        attributes: {
-          type: 'text',
-          value: '',
-          disabled: false,
-          readonly: false,
-          autofocus: false,
-          required: false,
-          minlength: 0,
-          maxlength: 100,
-          placeholder: '',
-        }
-      },
-      {
-        name: 'Image',
-        tag: 'img',
-        icon: 'fa-solid fa-image',//'assets/image.png',
-        attributes: {
-          src: '',
-          alt: '',
-          loading: 'auto',
-          decoding: 'auto',
-        }
-      },
-      {
-        name: 'Selectbox',
-        tag: 'select',
-        icon: 'fa-solid fa-list',// 'assets/combobox.png',
-        options: [],
-        attributes: {
-          disabled: false,
-          multiple: false,
-        }
-      },
-      {
-        name: 'Button',
-        tag: 'button',
-        icon: 'fa-solid fa-play', // 'assets/button.png',
-        attributes: {
-          value: 'Button',
-          type: 'submit',
-          disabled: false,
-          endPoint: '',
-          method: '',
-          // array parameters: []
-        }
-      },
-      {
-        name: 'Checkbox',
-        icon: 'fa-solid fa-square-check',//'assets/checkbox.png',
-        tag: 'input',
-        attributes: {
-          type: 'checkbox',
-          value: 'checkbox',
-          disabled: false,
-          name: 'name'
-        }
-      },
-      {
-        name: 'Radio',
-        tag: 'input',
-        icon: 'fa-regular fa-circle-dot',// 'assets/radio.png',
-        attributes: {
-          type: 'radio',
-          value: 'radio',
-          disabled: false,
-          name: 'name'
-        }
+
+  displayElements = [
+    {
+      name: 'Image',
+      tag: 'img',
+      icon: 'fa-solid fa-image',//'assets/image.png',
+      attributes: {
+        src: '',
+        alt: '',
+        loading: 'auto',
+        decoding: 'auto',
       }
-    ];
+    },
+  ];
+
+  textElements = [
+    {
+      name: 'Label',
+      tag: 'label',
+      icon: 'fa-solid fa-tag',// 'assets/label.png',
+      attributes: {
+        value: 'label',
+      }
+    },
+  ];
+
+  buttonElements = [
+    {
+      name: 'Button',
+      tag: 'button',
+      icon: 'fa-solid fa-play', // 'assets/button.png',
+      attributes: {
+        value: 'Button',
+        type: 'submit',
+        disabled: false,
+        endPoint: '',
+        method: '',
+        // array parameters: []
+      }
+    },
+  ];
+
+  inputElements = [
+    {
+      name: 'Input',
+      tag: 'input',
+      icon: 'fa-solid fa-text-width',//'assets/input.png',
+      attributes: {
+        type: 'text',
+        value: '',
+        disabled: false,
+        readonly: false,
+        autofocus: false,
+        required: false,
+        minlength: 0,
+        maxlength: 100,
+        placeholder: '',
+      }
+    },
+    {
+      name: 'Selectbox',
+      tag: 'select',
+      icon: 'fa-solid fa-list',// 'assets/combobox.png',
+      options: [],
+      attributes: {
+        disabled: false,
+        multiple: false,
+      }
+    },
+    {
+      name: 'Checkbox',
+      icon: 'fa-solid fa-square-check',//'assets/checkbox.png',
+      tag: 'input',
+      attributes: {
+        type: 'checkbox',
+        value: 'checkbox',
+        disabled: false,
+        name: 'name'
+      }
+    },
+    {
+      name: 'Radio',
+      tag: 'input',
+      icon: 'fa-regular fa-circle-dot',// 'assets/radio.png',
+      attributes: {
+        type: 'radio',
+        value: 'radio',
+        disabled: false,
+        name: 'name'
+      }
+    }
+  ];
 
   search() {
     this.filteredElements = this.elements.filter(el => {
@@ -124,6 +134,7 @@ export class ElementToolbarComponent {
   }
 
   ngOnInit() {
+    this.elements = [...this.inputElements, ...this.displayElements, ...this.textElements, ...this.buttonElements];
     this.filteredElements = this.elements;
   }
 
