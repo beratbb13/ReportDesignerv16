@@ -13,7 +13,6 @@ export class FolderService {
   constructor(private authService: AuthService, private http: HttpClient) { }
 
   token: string | null = this.authService.getToken();
-  private elementService!: ElementService;
   content: BehaviorSubject<any> = new BehaviorSubject<any>({});
   count: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   selectedFile: BehaviorSubject<file | null> = new BehaviorSubject<file | null>(null);
@@ -30,6 +29,20 @@ export class FolderService {
   save: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   getFormHtml: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
+  update() {
+    const body = {
+      "Token": this.token,
+      "DataStoreId": Endpoints.formTemplatesDataStoreId,
+      "Operation": "upsert",
+      "Data": `update form_files set cuser = 'beratbb13'`,
+      "Encrypted": "1951",
+    }
+    return this.http.post(Endpoints.dataops, body).pipe(
+      map((response: any) => {
+        return response;
+      })
+    );
+  }
 
   addFileByFolderId(folderId: number, fileName: string, username: string = 'beratbb13') {
     const body = {

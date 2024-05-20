@@ -1,0 +1,16 @@
+* {
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+ul.list-group li.list-group-item.struct {
+    border: none !important;
+    padding-left: 2px !important;
+}
+
+.space {
+    width: 3%;
+    display: inline-block;
+}

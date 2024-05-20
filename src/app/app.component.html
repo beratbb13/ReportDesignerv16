@@ -1,49 +1,93 @@
-<div
-  class="container-fluid"
-  style="max-width: 98vw"
-  *ngIf="savedTemplate === null"
->
+@if(!showOnPreview){
+<div class="container mt-2">
+  <div class="row">
+    <div class="col-3">
+      <div class="search d-flex justify-content-start align-items-center mb-1">
+        <input type="text" class="form-control" [(ngModel)]="relativePath" [disabled]="true" />
+        <!--<select class="form-select" [(ngModel)]="relativePath">
+          <option [value]="selectedFolder?.folderName">{{ selectedFolder?.folderName }}</option>
+          @for(folder of selectedFolder?.folders; track folder){
+          <option [value]="selectedFolder?.folderName + '/' + folder.folderName">{{ selectedFolder?.folderName + '/' +
+            folder.folderName }}</option>
+          }
+        </select>-->
+      </div>
+      <div class="d-flex justify-content-start align-items-center mb-1" style="padding-left: 2px !important">
+        <span (click)="goBack()" style="cursor: pointer"><i class="fa-solid fa-arrow-left"></i></span>
+        <span class="space"></span><span class="space"></span><span class="space"></span>
+        <span (click)="goForward()" style="cursor: pointer"><i class="fa-solid fa-arrow-right"></i></span>
+      </div>
+      @if(filteredFolder !== null ){
+      <ul class="list-group">
+        @for(file of filteredFolder.files; track file){
+        <li class="list-group-item struct d-flex justify-content-between">
+          <img src="assets/file.png" width="20" height="20" />&nbsp;
+          <span style="font-size: 22px; font-weight: 400">{{ file.name }}</span>
+          <i class="fa fa-eye" aria-hidden="true" style="cursor: pointer;"></i>
+        </li>
+        } @for(folder of filteredFolder.folders; track folder){
+        <li class="list-group-item struct d-flex justify-content-between" [ngStyle]="{
+            'background-color':
+              selectedFolder?.id === folder.id ? '#cce8ff' : ''
+          }" (click)="selectFolder(folder)" (dblclick)="go(folder)">
+          <img src="assets/folder.png" width="20" height="20" />&nbsp;
+          <span style="font-size: 22px; font-weight: 400">{{
+            folder.folderName
+            }}</span>
+          <span></span>
+          <!--@if(isopen){
+          <ul class="list-group">
+            @for(file of folder.files; track file){
+            <li class="list-group-item">
+              <img src="assets/file.png" width="20" height="20" />&nbsp;
+              <span style="font-size: 22px; font-weight: 400">{{ file.name }}</span>
+            </li>
+            }
+          </ul>
+          <ul class="list-group">
+            @for(folder of folder.folders; track folder){
+            <li class="list-group-item">
+              <img src="assets/folder.png" width="20" height="20" />&nbsp;
+              <span style="font-size: 22px; font-weight: 400">{{ folder.folderName }}</span>
+            </li>
+            }
+          </ul>
+          }-->
+        </li>
+        }
+      </ul>
+      }
+    </div>
+  </div>
+</div>
+}@else{
+<app-preview></app-preview>
+}
+<!--
+<div class="container-fluid" style="max-width: 98vw" *ngIf="savedTemplate === null">
   <div class="row d-flex justify-content-center" *ngIf="previewMode === false">
-    <div
-      class="col-lg-3 col-md-2 col-xs-12"
-      style="padding-left: 1px !important; padding-right: 0px !important"
-    >
+    <div class="col-lg-3 col-md-2 col-xs-12" style="padding-left: 1px !important; padding-right: 0px !important">
       <app-element-toolbar></app-element-toolbar>
     </div>
-    <div
-      class="col-lg-7 col-md-8 col-xs-9"
-      style="padding-left: 0px !important; padding-right: 1px !important"
-    >
+    <div class="col-lg-7 col-md-8 col-xs-9" style="padding-left: 0px !important; padding-right: 1px !important">
       <app-top-bar></app-top-bar>
-      <div
-        class="row"
-        style="
+      <div class="row" style="
           padding-top: 3px;
           padding-left: 0px !important;
           padding-right: 0px !important;
-        "
-      >
+        ">
         <app-main-editor></app-main-editor>
       </div>
     </div>
-    <div
-      class="col-lg-2 col-md-2 col-xs-3"
-      style="padding-left: 0px !important; padding-right: 0px !important"
-    >
+    <div class="col-lg-2 col-md-2 col-xs-3" style="padding-left: 0px !important; padding-right: 0px !important">
       <div class="row">
         <app-properties></app-properties>
       </div>
     </div>
   </div>
-  <div
-    class="row d-flex justify-content-center mb-3"
-    *ngIf="previewMode === true"
-  >
+  <div class="row d-flex justify-content-center mb-3" *ngIf="previewMode === true">
     <div class="col-8">
-      <nav
-        class="navbar navbar-light bg-light p-2"
-        style="background-color: rgba(187, 120, 36, 0.1) !important"
-      >
+      <nav class="navbar navbar-light bg-light p-2" style="background-color: rgba(187, 120, 36, 0.1) !important">
         <button mat-button (click)="goBackEdit()">Back to Edit</button>
       </nav>
     </div>
@@ -55,14 +99,11 @@
   </div>
 </div>
 
-<div
-  class="container-fluid"
-  style="max-width: 98vw"
-  *ngIf="savedTemplate !== null"
->
+<div class="container-fluid" style="max-width: 98vw" *ngIf="savedTemplate !== null">
   <div class="row d-flex justify-content-center">
     <div class="col justify-content-center">
       <app-preview></app-preview>
     </div>
   </div>
 </div>
+-->

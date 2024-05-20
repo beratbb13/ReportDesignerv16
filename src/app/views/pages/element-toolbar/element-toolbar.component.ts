@@ -38,7 +38,7 @@ export class ElementToolbarComponent {
     {
       name: 'Image',
       tag: 'img',
-      icon: 'fa-solid fa-image',//'assets/image.png',
+      icon: 'fa-solid fa-image',
       attributes: {
         src: '',
         alt: '',
@@ -52,7 +52,7 @@ export class ElementToolbarComponent {
     {
       name: 'Label',
       tag: 'label',
-      icon: 'fa-solid fa-tag',// 'assets/label.png',
+      icon: 'fa-solid fa-tag',
       attributes: {
         value: 'label',
       }
@@ -63,14 +63,13 @@ export class ElementToolbarComponent {
     {
       name: 'Button',
       tag: 'button',
-      icon: 'fa-solid fa-play', // 'assets/button.png',
+      icon: 'fa-solid fa-play',
       attributes: {
         value: 'Button',
         type: 'submit',
         disabled: false,
         endPoint: '',
         method: '',
-        // array parameters: []
       }
     },
   ];
@@ -79,7 +78,7 @@ export class ElementToolbarComponent {
     {
       name: 'Input',
       tag: 'input',
-      icon: 'fa-solid fa-text-width',//'assets/input.png',
+      icon: 'fa-solid fa-text-width',
       attributes: {
         type: 'text',
         value: '',
@@ -95,7 +94,7 @@ export class ElementToolbarComponent {
     {
       name: 'Selectbox',
       tag: 'select',
-      icon: 'fa-solid fa-list',// 'assets/combobox.png',
+      icon: 'fa-solid fa-list',
       options: [],
       attributes: {
         disabled: false,
@@ -104,7 +103,7 @@ export class ElementToolbarComponent {
     },
     {
       name: 'Checkbox',
-      icon: 'fa-solid fa-square-check',//'assets/checkbox.png',
+      icon: 'fa-solid fa-square-check',
       tag: 'input',
       attributes: {
         type: 'checkbox',
@@ -116,7 +115,7 @@ export class ElementToolbarComponent {
     {
       name: 'Radio',
       tag: 'input',
-      icon: 'fa-regular fa-circle-dot',// 'assets/radio.png',
+      icon: 'fa-regular fa-circle-dot',
       attributes: {
         type: 'radio',
         value: 'radio',
